@@ -142,3 +142,184 @@
     color: var(--color-foreground);
   }
 }
+
+@theme inline {
+  --font-sans: 'Nunito', sans-serif;
+  --font-display: 'Baloo 2', sans-serif;
+  --color-soil: var(--soil);
+  --color-wood: var(--wood);
+  --color-water: var(--water);
+}
+
+:root {
+  --radius: .5rem;
+  --background: oklch(.96 .028 91);
+  --foreground: oklch(.32 .066 53);
+  --primary: oklch(.52 .12 139);
+  --primary-foreground: oklch(.99 .02 95);
+  --secondary: oklch(.9 .08 88);
+  --secondary-foreground: oklch(.36 .07 52);
+  --muted: oklch(.92 .035 92);
+  --muted-foreground: oklch(.5 .055 69);
+  --accent: oklch(.85 .11 107);
+  --accent-foreground: oklch(.35 .08 139);
+  --card: oklch(.98 .035 93);
+  --card-foreground: var(--foreground);
+  --popover: var(--card);
+  --popover-foreground: var(--foreground);
+  --border: oklch(.78 .075 75);
+  --input: var(--border);
+  --ring: var(--primary);
+  --wood: oklch(.64 .095 61);
+  --wood-light: oklch(.86 .094 76);
+  --wood-dark: oklch(.39 .08 51);
+  --soil: oklch(.46 .085 55);
+  --soil-light: oklch(.58 .09 58);
+  --water: oklch(.76 .1 224);
+  --sky: oklch(.9 .065 223);
+  --gold: oklch(.86 .16 87);
+  --gold-dark: oklch(.67 .12 75);
+  --grass: oklch(.74 .135 121);
+  --shadow-game: 0 4px 0 var(--wood-dark), 0 6px 10px oklch(.27 .06 52 / .16);
+  --wood-gradient: linear-gradient(180deg, var(--wood-light), oklch(.76 .09 70));
+  --green-gradient: linear-gradient(180deg, oklch(.75 .16 128), oklch(.58 .13 135));
+}
+body { font-family: var(--font-sans); font-weight: 600; }
+h1,h2,h3,.display { font-family: var(--font-display); font-weight: 800; letter-spacing: 0; }
+button,a { -webkit-tap-highlight-color: transparent; }
+.game-shell { min-height: 100svh; background: var(--background); }
+.topbar { background: var(--primary); border-bottom: 4px solid var(--wood-dark); color: var(--primary-foreground); }
+.topbar-inner { max-width: 1440px; margin: auto; min-height: 84px; padding: 12px 36px; display: flex; align-items: center; gap: 28px; }
+.brand { display: flex; gap: 12px; align-items: center; color: inherit; text-decoration: none; }
+.brand img { height: 54px; width: 44px; object-fit: contain; }
+.brand h1 { font-size: 26px; line-height: 1; }
+.brand small { font-size: 11px; opacity: .7; text-transform: uppercase; }
+.top-divider { width: 1px; height: 36px; background: color-mix(in oklab, var(--primary-foreground) 22%, transparent); }
+.level { display: flex; align-items: center; gap: 9px; font-size: 12px; }
+.level-star { color: var(--gold); width: 33px; height: 33px; fill: var(--gold); }
+.level b { font-size: 17px; display: block; }
+.resources { display: flex; gap: 10px; margin-left: auto; }
+.resource { display: flex; align-items: center; gap: 8px; padding: 7px 14px; background: color-mix(in oklab, var(--wood-dark) 32%, transparent); border: 1px solid color-mix(in oklab, var(--primary-foreground) 20%, transparent); border-radius: 8px; font-size: 19px; font-weight: 900; }
+.resource img { height: 29px; width: 25px; object-fit: contain; }
+.resource .coin { color: var(--gold); fill: var(--gold-dark); }
+.resource .gem { color: var(--water); fill: var(--water); }
+.tool-button { color: var(--foreground); background: var(--wood-gradient); border: 2px solid var(--wood-dark); box-shadow: 0 3px 0 var(--wood-dark); width: 41px; height: 41px; border-radius: 12px; padding: 0; }
+.tool-button svg { width: 21px; height: 21px; }
+.farm-button,.wood-button { font-weight: 900; font-size: 15px; height: 42px; border: 2px solid var(--wood-dark); box-shadow: 0 3px 0 var(--wood-dark), inset 0 2px 0 color-mix(in oklab, var(--card) 50%, transparent); border-radius: 9px; transition: transform .15s; }
+.farm-button { background: var(--green-gradient); color: var(--primary-foreground); text-shadow: 0 1px 2px var(--primary); }
+.wood-button { background: var(--wood-gradient); color: var(--foreground); }
+.farm-button:hover,.wood-button:hover,.tool-button:hover { transform: translateY(-2px); }
+.farm-button:active,.wood-button:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--wood-dark); }
+.content-wrap { max-width: 1360px; margin: auto; padding: 26px 32px 114px; }
+.page-heading { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.page-heading h2 { font-size: 31px; line-height: 1.1; }
+.page-heading p { font-size: 13px; color: var(--muted-foreground); margin-top: 3px; }
+.day-badge { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--primary); }
+.day-badge svg { color: var(--gold-dark); }
+.farm-layout { display: grid; grid-template-columns: minmax(0, 1fr) 284px; gap: 24px; }
+.farm-scene { height: 620px; position: relative; overflow: hidden; border: 3px solid var(--wood-dark); border-radius: 12px; box-shadow: var(--shadow-game); background: var(--grass); }
+.world-image { position: absolute; width: 100%; height: 100%; object-fit: cover; object-position: 50% 45%; }
+.scene-label { position: absolute; top: 17px; left: 17px; display: flex; align-items: center; gap: 6px; padding: 7px 12px; background: var(--card); border: 2px solid var(--wood-dark); border-radius: 7px; font-size: 12px; }
+.scene-tools { position: absolute; top: 16px; right: 16px; display: flex; gap: 8px; }
+.tito-character { position: absolute; height: 182px; width: 150px; object-fit: contain; left: 35px; top: 168px; filter: drop-shadow(0 5px 3px oklch(.3 .05 50 / .25)); animation: tito-idle 4s ease-in-out infinite; }
+.tito-speech { position: absolute; top: 204px; left: 182px; background: var(--card); border: 2px solid var(--wood-dark); border-radius: 10px 10px 10px 0; font-size: 12px; padding: 10px 14px; max-width: 170px; }
+.tito-speech b { display: block; color: var(--primary); font-size: 15px; }
+.plots { position: absolute; bottom: 35px; left: 7%; right: 7%; display: grid; grid-template-columns: 1fr 1fr; gap: 17px 26px; }
+.plot-button { width: 100%; height: 123px; padding: 0; display: flex; flex-direction: column; gap: 0; white-space: normal; background: var(--soil); border: 6px solid var(--wood-light); border-radius: 14px; box-shadow: 0 4px 0 var(--wood-dark), inset 0 3px 6px var(--wood-dark); position: relative; overflow: visible; transition: transform .15s; }
+.plot-button:hover { transform: translateY(-3px); }
+.crop-row { width: 100%; height: 84px; display: flex; align-items: center; justify-content: space-evenly; background: repeating-linear-gradient(0deg, transparent, transparent 19px, var(--soil-light) 20px, transparent 24px); border-radius: 8px; }
+.crop-row img { width: 25%; height: 75px; object-fit: contain; filter: drop-shadow(0 3px 1px var(--wood-dark)); }
+.plot-caption { position: absolute; bottom: -8px; left: -5px; right: -5px; height: 32px; border: 2px solid var(--wood-dark); border-radius: 9px; background: var(--card); font-size: 12px; color: var(--foreground); display: flex; align-items: center; justify-content: center; gap: 5px; }
+.plot-caption.ready { background: var(--green-gradient); color: var(--primary-foreground); }
+.plot-caption.water { background: var(--sky); }
+.plot-caption svg { width: 14px; height: 14px; }
+.empty-plot { color: var(--wood-light); gap: 4px; flex-direction: column; }
+.empty-plot svg { width: 27px; height: 27px; }
+.sidebar-title { font-size: 20px; display: flex; align-items: center; gap: 8px; }
+.companion { display: flex; align-items: center; gap: 10px; margin: 12px 0 22px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
+.companion img { height: 64px; width: 55px; object-fit: contain; }
+.companion b { display: block; font-size: 14px; }
+.companion p { font-size: 12px; color: var(--muted-foreground); }
+.progress-track { height: 10px; width: 100%; background: var(--secondary); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--green-gradient); width: 40%; border-radius: inherit; }
+.mission-item { display: flex; align-items: center; gap: 10px; padding: 16px 0; border-bottom: 1px dashed var(--border); }
+.mission-icon { width: 42px; height: 42px; background: var(--secondary); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.mission-icon img { width: 31px; height: 32px; object-fit: contain; }
+.mission-item b { font-size: 13px; display: block; }
+.mission-item small { color: var(--muted-foreground); font-size: 11px; }
+.mission-reward { margin-left: auto; font-size: 13px; color: var(--primary); font-weight: 900; }
+.mission-link { width: 100%; margin: 16px 0 24px; }
+.well-preview { background: var(--sky); border: 2px solid var(--water); border-radius: 8px; padding: 15px; display: flex; gap: 12px; align-items: center; }
+.well-preview img { width: 72px; height: 82px; object-fit: contain; }
+.well-preview h3 { font-size: 19px; line-height: 1; }
+.well-preview p { font-size: 12px; margin: 4px 0 10px; }
+.well-preview .farm-button { height: 32px; font-size: 12px; padding: 0 10px; }
+.farm-bottom-note { display: flex; justify-content: space-between; gap: 12px; margin-top: 18px; font-size: 12px; color: var(--muted-foreground); }
+.farm-bottom-note span { display: flex; align-items: center; gap: 5px; }
+.bottom-nav { position: fixed; bottom: 19px; left: 50%; transform: translateX(-50%); width: min(760px, calc(100% - 36px)); background: var(--wood-gradient); border: 3px solid var(--wood-dark); border-radius: 14px; box-shadow: var(--shadow-game); z-index: 20; display: grid; grid-template-columns: repeat(5,1fr); padding: 6px; gap: 5px; }
+.farm-nav-button { height: 62px; width: 100%; border-radius: 8px; display: flex; flex-direction: column; gap: 4px; color: var(--wood-dark); font-size: 12px; font-weight: 900; padding: 5px; }
+.farm-nav-button svg { width: 24px; height: 24px; stroke-width: 2.2; }
+.farm-nav-button:hover { background: color-mix(in oklab, var(--card) 35%, transparent); }
+.farm-nav-button[data-active=true] { background: var(--card); box-shadow: inset 0 -4px 0 var(--primary); color: var(--primary); }
+.sub-page { max-width: 1000px; margin: auto; }
+.sub-heading { display: flex; align-items: center; gap: 15px; margin-bottom: 25px; }
+.sub-heading h2 { font-size: 32px; }
+.sub-heading p { font-size: 13px; color: var(--muted-foreground); }
+.shop-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 22px; }
+.shop-item { background: var(--card); border: 2px solid var(--border); border-radius: 8px; padding: 22px; text-align: center; }
+.shop-item img { height: 135px; width: 100%; object-fit: contain; margin: 12px 0; }
+.shop-item h3 { font-size: 22px; }
+.shop-item p { font-size: 12px; color: var(--muted-foreground); min-height: 35px; }
+.shop-item .farm-button { width: 100%; margin-top: 15px; }
+.shop-item .price { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 20px; margin-top: 10px; }
+.shop-item .price img { width: 23px; height: 25px; margin: 0; }
+.large-missions { max-width: 670px; margin: auto; }
+.large-missions .mission-item { padding: 22px 0; }
+.large-missions .mission-item b { font-size: 17px; }
+.large-missions .mission-icon { width: 56px; height: 56px; }
+.bonus-band { background: var(--secondary); border-block: 2px solid var(--border); margin-top: 22px; padding: 22px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.bonus-band h3 { font-size: 23px; }
+.bonus-band p { font-size: 12px; }
+.friends-feature { display: flex; justify-content: center; gap: 30px; align-items: center; margin: 15px 0 32px; }
+.friends-feature img { height: 210px; width: 170px; object-fit: contain; }
+.friends-feature h3 { font-size: 31px; }
+.friends-feature p { max-width: 320px; font-size: 14px; margin-bottom: 16px; color: var(--muted-foreground); }
+.friend-list { max-width: 600px; margin: auto; }
+.friend-empty { text-align: center; padding: 25px; color: var(--muted-foreground); border-block: 1px solid var(--border); }
+.water-screen { text-align: center; max-width: 600px; margin: auto; }
+.water-illustration { height: 275px; width: 100%; object-fit: contain; }
+.water-count { display: flex; justify-content: center; gap: 18px; margin: 18px 0; color: var(--water); }
+.water-count svg { height: 40px; width: 40px; fill: var(--water); }
+.water-count .used { opacity: .25; }
+.water-screen h3 { font-size: 25px; }
+.water-screen p { color: var(--muted-foreground); font-size: 13px; margin-bottom: 22px; }
+.market-balance { display: flex; justify-content: center; align-items: center; gap: 30px; border-block: 1px solid var(--border); padding: 35px 0; margin: 25px 0; }
+.market-balance img { width: 140px; height: 140px; object-fit: contain; }
+.market-balance strong { font-family: var(--font-display); font-size: 48px; }
+.market-balance p { color: var(--muted-foreground); font-size: 14px; }
+.notice { padding: 14px 18px; background: var(--sky); border-left: 4px solid var(--water); font-size: 13px; margin: 24px 0; }
+.toast-game { position: fixed; top: 100px; left: 50%; transform: translateX(-50%); background: var(--card); border: 2px solid var(--primary); padding: 12px 20px; border-radius: 8px; box-shadow: var(--shadow-game); z-index: 60; width: max-content; max-width: calc(100% - 30px); font-size: 14px; }
+.modal-backdrop { position: fixed; inset: 0; background: oklch(.25 .04 70 / .55); z-index: 70; display: grid; place-items: center; padding: 20px; }
+.settings-modal { background: var(--card); border: 3px solid var(--wood-dark); border-radius: 12px; padding: 24px; width: 360px; max-width: 100%; box-shadow: var(--shadow-game); }
+.settings-modal h3 { font-size: 26px; }
+.setting-row { display: flex; justify-content: space-between; padding: 18px 0; align-items: center; border-bottom: 1px solid var(--border); font-size: 14px; }
+.settings-modal>.wood-button { width: 100%; margin-top: 20px; }
+@keyframes tito-idle { 0%,100% { transform: translateY(0) rotate(-1deg); } 50% { transform: translateY(-5px) rotate(1deg); } }
+@media(min-width:1500px) { .content-wrap { padding-top: 40px; } .farm-scene { height: 680px; } .plots { bottom: 45px; gap: 24px; } .plot-button { height: 145px; } .crop-row { height: 107px; } .crop-row img { height: 92px; } }
+@media(max-width:1000px) { .farm-layout { grid-template-columns: minmax(0,1fr) 240px; gap: 18px; } .farm-scene { height: 590px; } .tito-speech { left: 140px; max-width: 145px; } .tito-character { left: 12px; width: 120px; } .topbar-inner { padding-inline: 24px; gap: 18px; } .resource { padding-inline: 10px; } .plots { left: 5%; right: 5%; gap: 17px; } }
+@media(max-width:700px) {
+ .topbar-inner { padding: 10px 13px; gap: 10px; min-height: 74px; flex-wrap: wrap; }
+ .brand { gap: 7px; } .brand img { height: 42px; width: 33px; } .brand h1 { font-size: 20px; max-width: 170px; } .brand small { font-size: 8px; }
+ .top-divider,.level,.top-settings { display: none; } .resources { gap: 5px; } .resource { padding: 5px 7px; gap: 4px; font-size: 15px; } .resource img { width: 18px; height: 22px; } .resource svg { width: 18px; } .resource-carrots { display: none; }
+ .content-wrap { padding: 17px 12px 107px; } .page-heading { margin-bottom: 13px; } .page-heading h2 { font-size: 25px; } .page-heading p { font-size: 11px; } .day-badge { font-size: 10px; gap: 4px; } .day-badge svg { width: 16px; }
+ .farm-layout { display: block; } .farm-scene { height: 515px; border-radius: 10px; } .world-image { object-position: 45% 40%; } .scene-label { left: 10px; top: 10px; font-size: 10px; padding: 5px 8px; } .scene-tools { right: 10px; top: 10px; gap: 6px; } .tool-button { width: 34px; height: 34px; border-radius: 8px; } .tool-button svg { width: 18px; height: 18px; }
+ .tito-character { height: 155px; width: 125px; top: 112px; left: 8px; } .tito-speech { top: 153px; left: 132px; font-size: 10px; max-width: 155px; padding: 8px 11px; } .tito-speech b { font-size: 14px; }
+ .plots { bottom: 29px; left: 5%; right: 5%; gap: 19px 15px; } .plot-button { height: 100px; border-width: 5px; border-radius: 12px; } .crop-row { height: 73px; } .crop-row img { width: 29%; height: 59px; } .plot-caption { font-size: 10px; height: 27px; }
+ .farm-sidebar { margin-top: 24px; } .companion { display: none; } .farm-sidebar .sidebar-title { font-size: 20px; } .farm-sidebar .mission-item { padding: 12px 0; } .well-preview { margin-top: 5px; } .farm-bottom-note { font-size: 10px; margin-top: 16px; } .farm-bottom-note span:last-child { display: none; }
+ .bottom-nav { bottom: 10px; width: calc(100% - 20px); padding: 5px 3px; gap: 2px; border-radius: 12px; } .farm-nav-button { height: 58px; font-size: 10px; gap: 5px; } .farm-nav-button svg { width: 23px; height: 23px; }
+ .sub-heading { gap: 10px; margin-bottom: 20px; } .sub-heading h2 { font-size: 26px; } .sub-heading p { font-size: 11px; } .shop-grid { grid-template-columns: 1fr 1fr; gap: 12px; } .shop-item { padding: 13px 10px; } .shop-item h3 { font-size: 19px; line-height: 1.1; } .shop-item img { height: 105px; } .shop-item p { font-size: 11px; min-height: 32px; } .shop-item .farm-button { font-size: 12px; padding-inline: 7px; }
+ .friends-feature { gap: 10px; } .friends-feature img { width: 115px; height: 170px; } .friends-feature h3 { font-size: 25px; line-height: 1.1; } .friends-feature p { font-size: 12px; } .friends-feature .farm-button { padding-inline: 12px; font-size: 12px; }
+ .large-missions .mission-item b { font-size: 14px; } .bonus-band { padding: 16px 10px; gap: 10px; } .bonus-band h3 { font-size: 19px; } .bonus-band .farm-button { font-size: 12px; padding-inline: 10px; }
+ .water-illustration { height: 255px; } .market-balance { gap: 15px; } .market-balance img { width: 90px; height: 110px; } .market-balance strong { font-size: 36px; } .toast-game { top: 87px; font-size: 12px; }
+}
+@media(prefers-reduced-motion:reduce) { *,*::before,*::after { animation: none !important; transition: none !important; } }
