@@ -57,7 +57,7 @@ export function FarmProvider({ children }: { children: ReactNode }) {
   const buy = (name: string, price: number) => { if (bought.includes(name)) return; if (carrots < price) { setMessage('No tienes suficientes zanahorias.'); return; } setCarrots(v => v - price); setBought(v => [...v, name]); setMessage(`${name} añadido a tu finca.`); };
   const ad = (reason: string, reward: () => void) => { setAds(v => v + 1); reward(); setMessage(`Anuncio de prueba visto · ${reason}`); };
   const prizes = [{ label: '10 zanahorias', run: () => setCarrots(v => v + 10) }, { label: '50 zanahorias', run: () => setCarrots(v => v + 50) }, { label: '1 balde de agua', run: () => setWater(v => v + 1) }, { label: '1 fertilizante', run: () => setFertilizer(v => v + 1) }, { label: 'Gracias por jugar', run: () => {} }];
-  const spin = () => { if (spins < 1) return ''; setSpins(v => v - 1); const p = prizes[Math.floor(Math.random() * prizes.length)]; p.run(); setMessage(`Ruleta: ${p.label}`); return p.label; };
+  const spin = () => { if (spins < 1) return ''; setSpins(v => v - 1); const p = prizes[Math.floor(Math.random() * prizes.length)] ?? prizes[4]!; p.run(); setMessage(`Ruleta: ${p.label}`); return p.label; };
   return <GameContext.Provider value={{ carrots, coins, water, fertilizer, plots, harvested, watered, invited, bought, bonus, spins, chestAt, discount, ads, toast: setMessage, harvest, buy, ad, spin,
     collect: () => { setWater(3); setMessage('¡Tus 3 baldes de agua están listos!'); },
     invite: () => { setInvited(1); setMessage('Invitación de prueba preparada. No se ha enviado.'); },
