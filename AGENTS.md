@@ -8,3 +8,6 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Share preview-only farm state through a React context around the route outlet; no financial or persistent service is implied.
+- Keep farm views in a shared screen module with distinct TanStack content routes and route-specific metadata.

@@ -10,33 +10,90 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AmigosRouteImport } from './routes/amigos'
+import { Route as MercadoRouteImport } from './routes/mercado'
+import { Route as MisionesRouteImport } from './routes/misiones'
+import { Route as PozoRouteImport } from './routes/pozo'
+import { Route as TiendaRouteImport } from './routes/tienda'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AmigosRoute = AmigosRouteImport.update({
+  id: '/amigos',
+  path: '/amigos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MercadoRoute = MercadoRouteImport.update({
+  id: '/mercado',
+  path: '/mercado',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MisionesRoute = MisionesRouteImport.update({
+  id: '/misiones',
+  path: '/misiones',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PozoRoute = PozoRouteImport.update({
+  id: '/pozo',
+  path: '/pozo',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TiendaRoute = TiendaRouteImport.update({
+  id: '/tienda',
+  path: '/tienda',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/amigos': typeof AmigosRoute
+  '/mercado': typeof MercadoRoute
+  '/misiones': typeof MisionesRoute
+  '/pozo': typeof PozoRoute
+  '/tienda': typeof TiendaRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/amigos': typeof AmigosRoute
+  '/mercado': typeof MercadoRoute
+  '/misiones': typeof MisionesRoute
+  '/pozo': typeof PozoRoute
+  '/tienda': typeof TiendaRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/amigos': typeof AmigosRoute
+  '/mercado': typeof MercadoRoute
+  '/misiones': typeof MisionesRoute
+  '/pozo': typeof PozoRoute
+  '/tienda': typeof TiendaRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/amigos' | '/mercado' | '/misiones' | '/pozo' | '/tienda'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/amigos' | '/mercado' | '/misiones' | '/pozo' | '/tienda'
+  id:
+    | '__root__'
+    | '/'
+    | '/amigos'
+    | '/mercado'
+    | '/misiones'
+    | '/pozo'
+    | '/tienda'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AmigosRoute: typeof AmigosRoute
+  MercadoRoute: typeof MercadoRoute
+  MisionesRoute: typeof MisionesRoute
+  PozoRoute: typeof PozoRoute
+  TiendaRoute: typeof TiendaRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +105,51 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/amigos': {
+      id: '/amigos'
+      path: '/amigos'
+      fullPath: '/amigos'
+      preLoaderRoute: typeof AmigosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mercado': {
+      id: '/mercado'
+      path: '/mercado'
+      fullPath: '/mercado'
+      preLoaderRoute: typeof MercadoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/misiones': {
+      id: '/misiones'
+      path: '/misiones'
+      fullPath: '/misiones'
+      preLoaderRoute: typeof MisionesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pozo': {
+      id: '/pozo'
+      path: '/pozo'
+      fullPath: '/pozo'
+      preLoaderRoute: typeof PozoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tienda': {
+      id: '/tienda'
+      path: '/tienda'
+      fullPath: '/tienda'
+      preLoaderRoute: typeof TiendaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AmigosRoute: AmigosRoute,
+  MercadoRoute: MercadoRoute,
+  MisionesRoute: MisionesRoute,
+  PozoRoute: PozoRoute,
+  TiendaRoute: TiendaRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
