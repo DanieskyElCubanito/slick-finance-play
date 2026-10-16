@@ -25,7 +25,8 @@ export function FarmProvider({ children }: { children: ReactNode }) {
   const [coins, setCoins] = useState(2560);
   const [water, setWater] = useState(3);
   const [fertilizer, setFertilizer] = useState(0);
-  const [plots, setPlots] = useState<Plot[]>([{ crop: 'carrot', state: 'ready' }, { crop: 'wheat', state: 'ready' }, { crop: 'tomato', state: 'water' }, { crop: 'carrot', state: 'empty' }]);
+  const [plots, setPlots] = useState<Plot[]>([{ crop: 'carrot', state: 'ready' }, { crop: 'wheat', state: 'ready' }, { crop: 'tomato', state: 'water' }, { crop: 'carrot', state: 'empty' }, { crop: 'wheat', state: 'empty', locked: 'Nivel 6' }, { crop: 'tomato', state: 'empty', locked: 'Invita 1 amigo' }, { crop: 'carrot', state: 'empty', locked: 'Nivel 8' }, { crop: 'wheat', state: 'empty', locked: 'Invita 3 amigos' }, { crop: 'tomato', state: 'empty', locked: 'Nivel 10' }]);
+  const [now, setNow] = useState(Date.now());
   const [harvested, setHarvested] = useState(0);
   const [watered, setWatered] = useState(0);
   const [invited, setInvited] = useState(0);
