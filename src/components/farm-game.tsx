@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from '
 import { Link } from '@tanstack/react-router';
 import { ArrowLeft, Check, ClipboardList, Coins, Copy, Droplets, Gem, Gift, House, Leaf, LockKeyhole, Mail, Plus, Settings, ShoppingBasket, Sprout, Star, Sun, Users, Volume2, VolumeX, Wheat } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import world from '@/assets/farm-world.jpg';
+import world from '@/assets/farm-field.jpg';
 import tito from '@/assets/tito.png';
 import carrot from '@/assets/carrot.png';
 import wheat from '@/assets/wheat.png';
