@@ -493,7 +493,7 @@ button,a { -webkit-tap-highlight-color: transparent; }
 /* V7 · surcos integrados en el campo del fondo */
 .farm-scene { height: auto !important; aspect-ratio: 1024 / 1280; max-height: 1100px; }
 .world-image { object-position: 50% 50% !important; object-fit: cover; }
-.plots-wrap { top: 33%; bottom: 10%; left: 6% !important; right: 6% !important; justify-content: center; }
+.plots-wrap { top: 30%; bottom: 22%; left: 6% !important; right: 6% !important; justify-content: center; }
 .plots-counter { position: absolute; top: -34px; left: 50%; transform: translateX(-50%); white-space: nowrap; }
 .plots-iso, .plots-iso { grid-template-columns: repeat(3,minmax(0,1fr)) !important; height: 100%; gap: 6% 5% !important; padding: 0; transform: none; }
 .furrow, .furrow-moist, .furrow-locked { height: auto !important; background: transparent !important; border: 0 !important; box-shadow: none !important; outline: 0; border-radius: 50% / 40% !important; animation: none; }
