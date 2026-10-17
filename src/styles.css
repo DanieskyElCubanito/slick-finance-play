@@ -506,4 +506,4 @@ button,a { -webkit-tap-highlight-color: transparent; }
 .plant::before { display: none; }
 .seed-row, .seed-hint, .lock-icon { position: relative; z-index: 1; margin-bottom: 18%; }
 .plot-caption { bottom: -4px !important; left: 4% !important; right: 4% !important; }
-@media(max-width:640px) { .plots-wrap { top: 38%; bottom: 17%; } .tito-speech { display: none; } .plots-iso { gap: 4% 3% !important; } .plot-caption { height: 22px !important; font-size: 9px !important; } }
+@media(max-width:640px) { .plots-wrap { top: 37%; bottom: 25%; } .tito-speech { display: none; } .plots-iso { gap: 4% 3% !important; } .plot-caption { height: 22px !important; font-size: 9px !important; } }
