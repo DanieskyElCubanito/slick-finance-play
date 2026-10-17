@@ -11,12 +11,13 @@ import watering from '@/assets/watering.png';
 import scarecrow from '@/assets/scarecrow.png';
 import well from '@/assets/well.png';
 import woodTexture from '@/assets/kawaii-wood.jpg';
+import plantedCarrot from '@/assets/planted-carrot.png';
 
 type Plot = { crop: 'carrot' | 'wheat' | 'tomato'; state: 'ready' | 'water' | 'empty' | 'growing'; end?: number; start?: number; locked?: string | undefined };
 type Game = { now: number; carrots: number; coins: number; water: number; fertilizer: number; plots: Plot[]; harvested: number; watered: number; invited: number; bought: string[]; bonus: boolean; spins: number; chestAt: number; discount: boolean; ads: number; toast: (message: string) => void; harvest: (index: number) => void; buy: (name: string, price: number) => void; collect: () => void; invite: () => void; claim: () => void; ad: (reason: string, reward: () => void) => void; spin: () => string; openChest: () => void; buyFertilizer: () => void; unlockDiscount: () => void; earn: (n: number) => void; addWater: (n: number) => void; addFertilizer: (n: number) => void; addSpin: () => void };
 const GameContext = createContext<Game | null>(null);
 function useGame() { const game = useContext(GameContext); if (!game) throw new Error('Farm provider missing'); return game; }
-const cropImages = { carrot, wheat, tomato };
+const cropImages = { carrot: plantedCarrot, wheat, tomato };
 export const farmMeta = (title: string, description: string) => ({ meta: [{ title: `${title} · Mi Finquita del Conejo` }, { name: 'description', content: description }, { property: 'og:title', content: `${title} · Mi Finquita del Conejo` }, { property: 'og:description', content: description }, { property: 'og:type', content: 'website' }, { name: 'twitter:card', content: 'summary_large_image' }] });
 export const dayEvents = ['Domingo de feria · ventas x1.5', 'Lunes de lluvia · todo crece x2', 'Martes tranquilo', 'Miércoles de plaga · protege con espantapájaros', 'Jueves soleado', 'Viernes de cosecha', 'Sábado de mercado'];
 const UPGRADED = 'Regadera mejorada';

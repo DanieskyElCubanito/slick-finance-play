@@ -11,3 +11,4 @@
 
 - Share preview-only farm state through a React context around the route outlet; no financial or persistent service is implied.
 - Keep farm views in a shared screen module with distinct TanStack content routes and route-specific metadata.
+- Position interactive crop rows in normalized coordinates of the background field and use planted sprites separately from inventory icons, so their bases remain on the ground at every screen size.
