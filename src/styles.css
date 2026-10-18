@@ -476,10 +476,10 @@ button,a { -webkit-tap-highlight-color: transparent; }
 
 /* Aligned planting beds · nine clear soil parcels */
 .farm-scene { height: auto !important; aspect-ratio: 4 / 5; min-height: 530px; max-height: none; background: var(--grass); }
-.world-image { height: 26%; object-fit: cover; object-position: center 15%; }
+.world-image { height: 100%; object-fit: cover; object-position: center; }
 .tito-character { top: 5%; left: 3%; width: 16%; height: 17%; animation: none; }
 .tito-speech { top: 9%; left: 20%; max-width: 190px; }
-.plots-wrap { position: absolute; top: 24%; bottom: 4%; left: 3%; right: 3%; padding: 0; gap: 0; background: var(--grass); }
+.plots-wrap { position: absolute; top: 30%; bottom: 9%; left: 3%; right: 3%; padding: 0; gap: 0; background: transparent; }
 .plots-counter { position: absolute; top: -32px; left: 50%; transform: translateX(-50%); white-space: nowrap; z-index: 4; }
 .plots-iso { position: static; display: grid; grid-template-columns: repeat(3,minmax(0,1fr)) !important; grid-template-rows: repeat(3,minmax(0,1fr)); width: 100%; height: 100%; gap: 3% 2% !important; padding: 0; transform: none; }
 .furrow, .furrow-moist, .furrow-locked { position: relative; width: 100%; height: 100% !important; min-width: 0; min-height: 0; padding: 0; border: 0; border-radius: 8px; background: transparent; box-shadow: none; outline: none; animation: none; overflow: hidden; isolation: isolate; }
@@ -502,6 +502,19 @@ button,a { -webkit-tap-highlight-color: transparent; }
 .seed-hint svg { width: 30px; height: 30px; }
 .plot-caption { position: absolute; left: 10%; right: 10%; bottom: 8%; min-height: 25px; height: auto; padding: 3px; font-size: 11px; line-height: 1.15; white-space: normal; border-radius: 8px; box-shadow: none; z-index: 3; }
 .plot-progress { position: absolute; top: 13%; left: 16%; width: 68%; height: 5px; z-index: 3; }
+.bed-count { position: absolute; top: 7%; right: 12%; color: var(--wood-light); font-size: 11px; font-weight: 900; z-index: 2; }
+.bed-slots { position: absolute; inset: 12% 13% 23%; display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); grid-template-rows: repeat(3,minmax(0,1fr)); gap: 0; }
+.carrot-slot { width: 100%; height: 100%; min-height: 0; padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--wood-light); }
+.carrot-slot:disabled { opacity: 1; }
+.carrot-slot:not(:disabled) { background: color-mix(in oklab,var(--soil-moist) 35%,transparent); }
+.carrot-slot:not(:disabled):hover { background: var(--soil-light); }
+.carrot-slot img { width: 100%; height: 115%; object-fit: contain; object-position: center bottom; transform-origin: center bottom; pointer-events: none; }
+.bed-slots.stage-1 img { transform: scale(.5); }
+.bed-slots.stage-2 img { transform: scale(.65); }
+.bed-slots.stage-3 img { transform: scale(.85); }
+.bed-actions { position: absolute; bottom: 6%; left: 8%; right: 8%; display: flex; gap: 3px; justify-content: center; }
+.bed-command { flex: 1; min-width: 0; height: 27px; padding: 2px 3px; font-size: 11px; line-height: 1.1; gap: 3px; border-radius: 8px; box-shadow: none; white-space: normal; }
+.bed-command svg { width: 12px; height: 12px; }
 @media(max-width:700px) {
  .farm-scene { min-height: 530px; }
  .tito-speech { display: none; }
@@ -509,4 +522,7 @@ button,a { -webkit-tap-highlight-color: transparent; }
  .plots-counter { font-size: 11px; top: -32px; }
  .plot-caption { font-size: 10px; min-height: 25px; }
  .plot-caption svg { display: none; }
+ .bed-command { font-size: 10px; height: 29px; }
+ .bed-command svg { display: none; }
+ .bed-count { font-size: 10px; }
 }
