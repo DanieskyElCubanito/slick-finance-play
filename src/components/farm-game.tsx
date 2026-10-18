@@ -2,7 +2,8 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from '
 import { Link } from '@tanstack/react-router';
 import { ArrowLeft, Check, ClipboardList, Coins, Copy, Droplets, Gem, Gift, House, Leaf, LockKeyhole, Mail, Plus, Settings, ShoppingBasket, Sprout, Star, Sun, Users, Volume2, VolumeX, Wheat } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import world from '@/assets/farm-field.jpg';
+import world from '@/assets/farm-meadow.jpg';
+import { BED_CAPACITY, fillBed, plantedSlots } from '@/lib/farm-planting';
 import tito from '@/assets/tito.png';
 import carrot from '@/assets/carrot.png';
 import wheat from '@/assets/wheat.png';
@@ -14,8 +15,8 @@ import woodTexture from '@/assets/kawaii-wood.jpg';
 import plantedCarrot from '@/assets/planted-carrot.png';
 import plantingBed from '@/assets/planting-bed.png';
 
-type Plot = { crop: 'carrot' | 'wheat' | 'tomato'; state: 'ready' | 'water' | 'empty' | 'growing'; end?: number; start?: number; locked?: string | undefined };
-type Game = { now: number; carrots: number; coins: number; water: number; fertilizer: number; plots: Plot[]; harvested: number; watered: number; invited: number; bought: string[]; bonus: boolean; spins: number; chestAt: number; discount: boolean; ads: number; toast: (message: string) => void; harvest: (index: number) => void; buy: (name: string, price: number) => void; collect: () => void; invite: () => void; claim: () => void; ad: (reason: string, reward: () => void) => void; spin: () => string; openChest: () => void; buyFertilizer: () => void; unlockDiscount: () => void; earn: (n: number) => void; addWater: (n: number) => void; addFertilizer: (n: number) => void; addSpin: () => void };
+type Plot = { crop: 'carrot' | 'wheat' | 'tomato'; state: 'ready' | 'water' | 'empty' | 'growing'; end?: number; start?: number; locked?: string | undefined; slots?: number[] };
+type Game = { now: number; carrots: number; coins: number; water: number; fertilizer: number; plots: Plot[]; harvested: number; watered: number; invited: number; bought: string[]; bonus: boolean; spins: number; chestAt: number; discount: boolean; ads: number; toast: (message: string) => void; harvest: (index: number) => void; plant: (index: number, slot?: number) => void; buy: (name: string, price: number) => void; collect: () => void; invite: () => void; claim: () => void; ad: (reason: string, reward: () => void) => void; spin: () => string; openChest: () => void; buyFertilizer: () => void; unlockDiscount: () => void; earn: (n: number) => void; addWater: (n: number) => void; addFertilizer: (n: number) => void; addSpin: () => void };
 const GameContext = createContext<Game | null>(null);
 function useGame() { const game = useContext(GameContext); if (!game) throw new Error('Farm provider missing'); return game; }
 const cropImages = { carrot: plantedCarrot, wheat, tomato };
@@ -46,8 +47,8 @@ export function FarmProvider({ children }: { children: ReactNode }) {
   const harvest = (index: number) => {
     const plot = plots[index]; if (!plot) return;
     if (plot.locked) { setMessage(`Surco bloqueado · ${plot.locked}. ¡Sigue jugando para abrirlo!`); return; }
-    if (plot.state === 'ready') { const gain = bought.includes(UPGRADED) ? 44 : 40; setCarrots(v => v + gain); setCoins(v => v + 25); setHarvested(v => v + 1); setPlots(v => v.map((p, i) => i === index ? { ...p, state: 'empty' } : p)); setMessage(`¡Buena cosecha! +${gain} zanahorias y +25 monedas`); }
-    else if (plot.state === 'empty') { setPlots(v => v.map((p, i) => i === index ? { ...p, state: 'water' } : p)); setMessage('¡Semillas plantadas! Ahora toca regar.'); }
+    if (plot.state === 'ready') { const gain = bought.includes(UPGRADED) ? 44 : 40; setCarrots(v => v + gain); setCoins(v => v + 25); setHarvested(v => v + 1); setPlots(v => v.map((p, i) => i === index ? { ...p, state: 'empty', slots: [] } : p)); setMessage(`¡Buena cosecha! +${gain} zanahorias y +25 monedas`); }
+    else if (plot.state === 'empty') plant(index);
     else if (plot.state === 'water') {
       if (water === 0) { setMessage('No quedan baldes. Visita el pozo.'); return; }
       let secs = rain ? 15 : 30; const useFert = fertilizer > 0; if (useFert) { secs = Math.ceil(secs / 2); setFertilizer(v => v - 1); }
@@ -59,11 +60,17 @@ export function FarmProvider({ children }: { children: ReactNode }) {
     }
     else setMessage('Tu cultivo está creciendo. ¡Tito lo está cuidando!');
   };
+  const plant = (index: number, slot?: number) => {
+    setPlots(current => current.map((p, i) => {
+      if (i !== index || p.locked || (p.state !== 'empty' && p.state !== 'water')) return p;
+      return { ...p, crop: 'carrot', state: 'water', slots: fillBed(plantedSlots(p.state, p.slots), slot) };
+    }));
+  };
   const buy = (name: string, price: number) => { if (bought.includes(name)) return; if (carrots < price) { setMessage('No tienes suficientes zanahorias.'); return; } setCarrots(v => v - price); setBought(v => [...v, name]); setMessage(`${name} añadido a tu finca.`); };
   const ad = (reason: string, reward: () => void) => { setAds(v => v + 1); reward(); setMessage(`Anuncio de prueba visto · ${reason}`); };
   const prizes = [{ label: '10 zanahorias', run: () => setCarrots(v => v + 10) }, { label: '50 zanahorias', run: () => setCarrots(v => v + 50) }, { label: '1 balde de agua', run: () => setWater(v => v + 1) }, { label: '1 fertilizante', run: () => setFertilizer(v => v + 1) }, { label: 'Gracias por jugar', run: () => {} }];
-  const spin = () => { if (spins < 1) return ''; setSpins(v => v - 1); const p = prizes[Math.floor(Math.random() * prizes.length)] ?? prizes[4]!; p.run(); setMessage(`Ruleta: ${p.label}`); return p.label; };
-  return <GameContext.Provider value={{ now, carrots, coins, water, fertilizer, plots, harvested, watered, invited, bought, bonus, spins, chestAt, discount, ads, toast: setMessage, harvest, buy, ad, spin,
+  const spin = () => { if (spins < 1) return ''; setSpins(v => v - 1); const p = prizes[Math.floor(Math.random() * prizes.length)] ?? prizes[4]; if (!p) return ''; p.run(); setMessage(`Ruleta: ${p.label}`); return p.label; };
+  return <GameContext.Provider value={{ now, carrots, coins, water, fertilizer, plots, harvested, watered, invited, bought, bonus, spins, chestAt, discount, ads, toast: setMessage, harvest, plant, buy, ad, spin,
     collect: () => { setWater(3); setMessage('¡Tus 3 baldes de agua están listos!'); },
     invite: () => { setInvited(1); setPlots(v => v.map(p => p.locked === 'Invita 1 amigo' ? { ...p, locked: undefined } : p)); setMessage('Invitación de prueba preparada. ¡Un surco se ha desbloqueado!'); },
     claim: () => { if (harvested < 2 || watered < 3 || invited < 1 || bonus) return; setBonus(true); setCarrots(v => v + 100); setMessage('¡Bono recogido! +100 zanahorias'); },
@@ -82,15 +89,34 @@ function MissionRows({ large = false }: { large?: boolean }) {
  const game = useGame(); const rows = [{ name: 'Cosecha 2 veces', value: game.harvested, total: 2, reward: 20, image: carrot }, { name: 'Riega 3 veces', value: game.watered, total: 3, reward: 30, image: watering }, { name: 'Invita a un amigo', value: game.invited, total: 1, reward: 100, image: tito }];
  return <div className={large ? 'large-missions' : ''}>{rows.map(row => <div className="mission-item" key={row.name}><div className="mission-icon"><img src={row.image} alt="" /></div><div><b>{row.name}</b><small>{Math.min(row.value, row.total)} de {row.total} completados</small></div><span className="mission-reward">{row.value >= row.total ? <Check size={20} /> : `+${row.reward}`}</span></div>)}</div>;
 }
+function PlantingBed({ plot, index }: { plot: Plot; index: number }) {
+ const game = useGame();
+ const slots = plantedSlots(plot.state, plot.slots);
+ const pct = plot.state === 'ready' ? 100 : plot.state === 'growing' && plot.start && plot.end ? Math.min(99, Math.max(1, Math.round((game.now - plot.start) / (plot.end - plot.start) * 100))) : 0;
+ const left = plot.end ? Math.max(0, Math.ceil((plot.end - game.now) / 1000)) : 0;
+ const stage = plot.state === 'ready' ? 4 : pct >= 50 ? 3 : pct >= 25 ? 2 : 1;
+ if (plot.locked) return <Button variant="plot" className="furrow furrow-locked" aria-label={`Surco bloqueado: ${plot.locked}`} onClick={() => game.toast(`Surco bloqueado · ${plot.locked}`)}><img className="bed-ground" src={plantingBed} alt="" /><LockKeyhole className="lock-icon" /><span className="plot-caption">{plot.locked}</span></Button>;
+ const canPlant = plot.state === 'empty' || plot.state === 'water';
+ return <div className={`furrow furrow-user${plot.state === 'water' ? ' furrow-moist' : ''}`} role="group" aria-label={`Parcela ${index + 1}`}>
+   <img className="bed-ground" src={plantingBed} alt="" />
+   <span className="bed-count">{slots.length}/{BED_CAPACITY}</span>
+   <div className={`bed-slots stage-${stage}`}>
+    {Array.from({ length: BED_CAPACITY }, (_, slot) => {
+     const occupied = slots.includes(slot);
+     return <Button key={slot} variant="ghost" className="carrot-slot" aria-label={`${occupied ? 'Zanahoria' : 'Sembrar zanahoria'} ${slot + 1} en parcela ${index + 1}`} title={occupied ? 'Zanahoria sembrada' : 'Sembrar zanahoria'} disabled={occupied || !canPlant} onClick={() => game.plant(index, slot)}>{occupied ? <img src={cropImages[plot.crop]} alt="" /> : canPlant ? <Plus /> : null}</Button>;
+    })}
+   </div>
+   {plot.state === 'growing' && <div className="plot-progress"><span style={{ width: `${pct}%` }} /></div>}
+   <div className="bed-actions">
+    {canPlant && slots.length < BED_CAPACITY && <Button variant="wood" className="bed-command" aria-label={`Sembrar todas en parcela ${index + 1}`} onClick={() => game.plant(index)}><Sprout /><span>Sembrar 9</span></Button>}
+    {plot.state !== 'empty' && <Button variant={plot.state === 'ready' ? 'farm' : 'wood'} className="bed-command" disabled={plot.state === 'growing'} aria-label={`${plot.state === 'ready' ? 'Cosechar' : 'Regar'} parcela ${index + 1}`} onClick={() => game.harvest(index)}>{plot.state === 'ready' ? <><Wheat /><span>Cosechar</span></> : plot.state === 'water' ? <><Droplets /><span>Regar</span></> : <span>{left}s</span>}</Button>}
+   </div>
+ </div>;
+}
+
 export function FarmHome() {
  const game = useGame();
- return <FarmShell active="/"><div className="page-heading"><div><h2>¡Qué bueno verte, granjero!</h2><p>Un nuevo día para hacer crecer tu finquita.</p></div><span className="day-badge"><Sun size={20} /> Día soleado · 24°</span></div><div className="farm-layout"><div><section className="farm-scene" aria-label="Tu finca"><img className="world-image" src={world} alt="Finca ilustrada con una casita, un pozo y colinas verdes" /><span className="scene-label"><Leaf size={14} /> La finca de Tito · Nivel 5</span><div className="scene-tools"><Button variant="tool" asChild aria-label="Ir al pozo" title="Ir al pozo"><Link to="/pozo"><Droplets /></Link></Button><Button variant="tool" aria-label="Mensajes" title="Mensajes" onClick={() => game.toast('Tito: ¡Me alegra tenerte de vuelta en la finca!')}><Mail /></Button></div><img src={tito} alt="Tito, tu compañero granjero" className="tito-character" /><div className="tito-speech"><b>¡Hola, soy Tito!</b>Las zanahorias ya están listas. ¡Vamos a cosechar!</div><div className="plots-wrap"><div className="plots-counter"><Sprout size={15} /> Surcos: {game.plots.filter(p => !p.locked).length}/9 desbloqueados</div><div className="plots plots-iso">{game.plots.map((plot, index) => {
-      if (plot.locked) return <Button variant="plot" key={index} className="furrow furrow-locked" aria-label={`Surco bloqueado: ${plot.locked}`} onClick={() => game.toast(`Surco bloqueado · ${plot.locked}`)}><img className="bed-ground" src={plantingBed} alt="" width={768} height={768} /><LockKeyhole className="lock-icon" /><span className="plot-caption">{plot.locked}</span></Button>;
-      const pct = plot.state === 'ready' ? 100 : plot.state === 'growing' && plot.start && plot.end ? Math.min(99, Math.max(1, Math.round(((game.now - plot.start) / (plot.end - plot.start)) * 100))) : 0;
-      const left = plot.state === 'growing' && plot.end ? Math.max(0, Math.ceil((plot.end - game.now) / 1000)) : 0;
-      const stage = pct >= 50 ? 3 : pct >= 25 ? 2 : 1;
-      return <Button variant="plot" key={index} className={`furrow furrow-user${plot.state === 'empty' ? ' furrow-empty' : ''}${plot.state === 'water' ? ' furrow-moist' : ''}`} aria-label={`${plot.state === 'ready' ? 'Cosechar' : plot.state === 'empty' ? 'Plantar' : plot.state === 'water' ? 'Regar' : 'Cultivo creciendo'} parcela ${index + 1}`} onClick={() => game.harvest(index)}><img className="bed-ground" src={plantingBed} alt="" width={768} height={768} />{plot.state === 'empty' && <div className="seed-hint"><Plus /></div>}{plot.state === 'water' && <div className="plant stage-1">{[0,1,2].map(i => <span className="crop-sprout" key={i}><img src={plantedCarrot} alt="" width={512} height={512} /></span>)}</div>}{plot.state === 'growing' && <div className={`plant stage-${stage}`}>{[0, 1, 2].map(plant => <span className="crop-sprout" key={plant}><img src={cropImages[plot.crop]} alt="" width={512} height={512} /></span>)}</div>}{plot.state === 'ready' && <div className="plant stage-4 ready-glow">{[0, 1, 2].map(plant => <span className="crop-sprout" key={plant}><img src={cropImages[plot.crop]} alt="" width={512} height={512} /></span>)}</div>}{plot.state === 'growing' && <div className="plot-progress"><span style={{ width: `${pct}%` }} /></div>}<span className={`plot-caption ${plot.state === 'ready' ? 'ready' : plot.state === 'water' ? 'water' : ''}`}>{plot.state === 'ready' ? <><Wheat /> ¡Cosechar ahora!</> : plot.state === 'empty' ? <><Sprout /> Plantar semillas</> : plot.state === 'water' ? <><Droplets /> Regar cultivo</> : <><Leaf /> Creciendo · {left}s</>}</span></Button>;
-    })}</div></div></section><div className="farm-bottom-note"><span><Sprout size={15} /> Hecho con cariño, cultivado por ti.</span><span><Droplets size={15} /> {game.water}/3 cubos de agua</span></div></div><aside className="farm-sidebar"><h3 className="sidebar-title"><Leaf size={19} /> Tu compañero de finca</h3><div className="companion"><img src={tito} alt="" /><div><b>Tito está de buen humor</b><p>¡Hoy será un gran día!</p></div></div><h3 className="sidebar-title"><Star size={19} /> Misiones del día</h3><MissionRows /><Button variant="wood" asChild className="mission-link"><Link to="/misiones">Ver misiones <ArrowLeft className="rotate-180" /></Link></Button><div className="well-preview"><img src={well} alt="Pozo de agua" /><div><h3>Un poquito de agua</h3><p>{game.water}/3 cubos disponibles</p><Button variant="farm" asChild><Link to="/pozo"><Droplets /> Visitar pozo</Link></Button></div></div></aside></div></FarmShell>;
+ return <FarmShell active="/"><div className="page-heading"><div><h2>¡Qué bueno verte, granjero!</h2><p>Un nuevo día para hacer crecer tu finquita.</p></div><span className="day-badge"><Sun size={20} /> Día soleado · 24°</span></div><div className="farm-layout"><div><section className="farm-scene" aria-label="Tu finca"><img className="world-image" src={world} alt="Finca ilustrada con una casita, un pozo y colinas verdes" /><span className="scene-label"><Leaf size={14} /> La finca de Tito · Nivel 5</span><div className="scene-tools"><Button variant="tool" asChild aria-label="Ir al pozo" title="Ir al pozo"><Link to="/pozo"><Droplets /></Link></Button><Button variant="tool" aria-label="Mensajes" title="Mensajes" onClick={() => game.toast('Tito: ¡Me alegra tenerte de vuelta en la finca!')}><Mail /></Button></div><img src={tito} alt="Tito, tu compañero granjero" className="tito-character" /><div className="tito-speech"><b>¡Hola, soy Tito!</b>Las zanahorias ya están listas. ¡Vamos a cosechar!</div><div className="plots-wrap"><div className="plots-counter"><Sprout size={15} /> Surcos: {game.plots.filter(p => !p.locked).length}/9 desbloqueados</div><div className="plots plots-iso">{game.plots.map((plot, index) => <PlantingBed key={index} plot={plot} index={index} />)}</div></div></section><div className="farm-bottom-note"><span><Sprout size={15} /> Hecho con cariño, cultivado por ti.</span><span><Droplets size={15} /> {game.water}/3 cubos de agua</span></div></div><aside className="farm-sidebar"><h3 className="sidebar-title"><Leaf size={19} /> Tu compañero de finca</h3><div className="companion"><img src={tito} alt="" /><div><b>Tito está de buen humor</b><p>¡Hoy será un gran día!</p></div></div><h3 className="sidebar-title"><Star size={19} /> Misiones del día</h3><MissionRows /><Button variant="wood" asChild className="mission-link"><Link to="/misiones">Ver misiones <ArrowLeft className="rotate-180" /></Link></Button><div className="well-preview"><img src={well} alt="Pozo de agua" /><div><h3>Un poquito de agua</h3><p>{game.water}/3 cubos disponibles</p><Button variant="farm" asChild><Link to="/pozo"><Droplets /> Visitar pozo</Link></Button></div></div></aside></div></FarmShell>;
 }
 function Heading({ title, subtitle }: { title: string; subtitle: string }) { return <div className="sub-heading"><Button variant="tool" asChild aria-label="Volver a la finca"><Link to="/"><ArrowLeft /></Link></Button><div><h2>{title}</h2><p>{subtitle}</p></div></div>; }
 export function ShopScreen() {
