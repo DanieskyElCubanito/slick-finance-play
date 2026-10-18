@@ -494,7 +494,7 @@ button,a { -webkit-tap-highlight-color: transparent; }
 .farm-scene { height: auto !important; aspect-ratio: 1024 / 1280; max-height: 1100px; }
 .world-image { object-position: 50% 50% !important; object-fit: cover; }
 .plots-wrap { top: 37%; bottom: 25%; left: 9% !important; right: 9% !important; justify-content: center; }
-.plots-counter { position: absolute; top: -34px; left: 50%; transform: translateX(-50%); white-space: nowrap; }
+.plots-counter { position: absolute; top: -54px; left: 50%; transform: translateX(-50%); white-space: nowrap; }
 .plots-iso { grid-template-columns: repeat(3,minmax(0,1fr)) !important; grid-template-rows: repeat(3,minmax(0,1fr)); height: 100%; gap: 9% 5% !important; padding: 0; transform: none; }
 .furrow, .furrow-moist, .furrow-locked { height: auto !important; background: transparent !important; border: 0 !important; box-shadow: none !important; outline: 0; border-radius: 50% / 40% !important; animation: none; }
 .furrow::before { display: none; }
@@ -509,4 +509,5 @@ button,a { -webkit-tap-highlight-color: transparent; }
 .seed-row, .seed-hint, .lock-icon { position: relative; z-index: 1; margin-bottom: 18%; }
 .seed-hint { color: var(--wood-dark); }
 .plot-caption { bottom: -4px !important; left: 4% !important; right: 4% !important; }
-@media(max-width:700px) { .tito-speech { display: none; } .plot-caption { height: 22px !important; font-size: 9px !important; } }
+@media(max-width:700px) { .tito-speech { display: none; } .tito-character { top: 8%; width: 22%; height: 24%; } .plot-caption { height: 26px !important; font-size: 9px !important; line-height: 1.1; padding: 2px; } .plots-counter { font-size: 10px; } }
+@media(max-width:420px) { .plot-caption svg { display: none; } .plots-counter { top: -46px; left: auto; right: 0; transform: none; font-size: 9px; padding: 4px 7px; } }
