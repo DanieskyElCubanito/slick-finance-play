@@ -1,4 +1,6 @@
 # Roadmap
+- [ ] Prepare the existing game for GitHub export and Vercel hosting, with deployment instructions.
+- [ ] Connect the user's external Supabase project and implement saved progress (blocked: user must connect it in project settings).
 - [x] Give each bed nine individually plantable spaces and a plant-all action.
 - [x] Replace unused plowed background with grass and verify planting at phone and desktop sizes.
 - [x] Create improved illustrated assets from the references.
