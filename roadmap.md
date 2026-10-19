@@ -1,6 +1,6 @@
 # Roadmap
-- [ ] Give each bed nine individually plantable spaces and a plant-all action.
-- [ ] Replace unused plowed background with grass and verify planting at phone and desktop sizes.
+- [x] Give each bed nine individually plantable spaces and a plant-all action.
+- [x] Replace unused plowed background with grass and verify planting at phone and desktop sizes.
 - [x] Create improved illustrated assets from the references.
 - [x] Build Spanish farm screens and interactive preview controls.
 - [x] Verify the farm on desktop and mobile.
