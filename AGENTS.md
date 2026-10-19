@@ -13,3 +13,5 @@
 - Keep farm views in a shared screen module with distinct TanStack content routes and route-specific metadata.
 - Render farm beds as an aligned responsive 3×3 ground grid with planted sprites separate from inventory icons, so crops stay contained inside their own soil beds at every screen size.
 - Track occupied positions per bed through shared pure planting helpers, with separate position buttons and bed actions to avoid nested interactive controls and keep individual and bulk planting consistent.
+- Use the shared Vite configuration's Nitro Vercel preset for external hosting while retaining Lovable's managed target override; this preserves SSR and direct navigation without SPA rewrites.
+- External database connections must use the generated integration after the user links their project in settings; deployment preparation must not imply preview state is already persisted.
