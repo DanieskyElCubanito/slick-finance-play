@@ -475,7 +475,7 @@ button,a { -webkit-tap-highlight-color: transparent; }
 @media(prefers-reduced-motion:reduce) { *,*::before,*::after { animation: none !important; transition: none !important; } }
 
 /* Aligned planting beds · nine clear soil parcels */
-.farm-scene { height: auto !important; aspect-ratio: 4 / 5; min-height: 530px; max-height: none; background: var(--grass); }
+.farm-scene { width: 100%; height: auto !important; aspect-ratio: 4 / 5; min-height: 530px; max-height: none; background: var(--grass); }
 .world-image { height: 100%; object-fit: cover; object-position: center; }
 .tito-character { top: 5%; left: 3%; width: 16%; height: 17%; animation: none; }
 .tito-speech { top: 9%; left: 20%; max-width: 190px; }
