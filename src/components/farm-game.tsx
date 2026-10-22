@@ -1,13 +1,11 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import { Link } from '@tanstack/react-router';
-import { ArrowLeft, Check, ClipboardList, Coins, Copy, Droplets, Gem, Gift, House, Leaf, LockKeyhole, Mail, Plus, Settings, ShoppingBasket, Sprout, Star, Sun, Users, Volume2, VolumeX, Wheat } from 'lucide-react';
+import { ArrowLeft, Check, ClipboardList, Coins, Copy, Droplets, Gem, Gift, House, Leaf, LockKeyhole, Mail, Plus, Settings, ShoppingBasket, Sprout, Star, Sun, Users, Volume2, VolumeX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import world from '@/assets/farm-meadow.jpg';
 import { BED_CAPACITY, fillBed, plantedSlots } from '@/lib/farm-planting';
 import tito from '@/assets/tito.png';
 import carrot from '@/assets/carrot.png';
-import wheat from '@/assets/wheat.png';
-import tomato from '@/assets/tomato.png';
 import watering from '@/assets/watering.png';
 import scarecrow from '@/assets/scarecrow.png';
 import well from '@/assets/well.png';
@@ -15,11 +13,11 @@ import woodTexture from '@/assets/kawaii-wood.jpg';
 import plantedCarrot from '@/assets/planted-carrot.png';
 import plantingBed from '@/assets/planting-bed.png';
 
-type Plot = { crop: 'carrot' | 'wheat' | 'tomato'; state: 'ready' | 'water' | 'empty' | 'growing'; end?: number; start?: number; locked?: string | undefined; slots?: number[] };
+type Plot = { crop: 'carrot'; state: 'ready' | 'water' | 'empty' | 'growing'; end?: number; start?: number; locked?: string | undefined; slots?: number[] };
 type Game = { now: number; carrots: number; coins: number; water: number; fertilizer: number; plots: Plot[]; harvested: number; watered: number; invited: number; bought: string[]; bonus: boolean; spins: number; chestAt: number; discount: boolean; ads: number; toast: (message: string) => void; harvest: (index: number) => void; plant: (index: number, slot?: number) => void; buy: (name: string, price: number) => void; collect: () => void; invite: () => void; claim: () => void; ad: (reason: string, reward: () => void) => void; spin: () => string; openChest: () => void; buyFertilizer: () => void; unlockDiscount: () => void; earn: (n: number) => void; addWater: (n: number) => void; addFertilizer: (n: number) => void; addSpin: () => void };
 const GameContext = createContext<Game | null>(null);
 function useGame() { const game = useContext(GameContext); if (!game) throw new Error('Farm provider missing'); return game; }
-const cropImages = { carrot: plantedCarrot, wheat, tomato };
+const cropImages = { carrot: plantedCarrot };
 export const farmMeta = (title: string, description: string) => ({ meta: [{ title: `${title} · Mi Finquita del Conejo` }, { name: 'description', content: description }, { property: 'og:title', content: `${title} · Mi Finquita del Conejo` }, { property: 'og:description', content: description }, { property: 'og:type', content: 'website' }, { name: 'twitter:card', content: 'summary_large_image' }] });
 export const dayEvents = ['Domingo de feria · ventas x1.5', 'Lunes de lluvia · todo crece x2', 'Martes tranquilo', 'Miércoles de plaga · protege con espantapájaros', 'Jueves soleado', 'Viernes de cosecha', 'Sábado de mercado'];
 const UPGRADED = 'Regadera mejorada';
@@ -29,7 +27,7 @@ export function FarmProvider({ children }: { children: ReactNode }) {
   const [coins, setCoins] = useState(2560);
   const [water, setWater] = useState(3);
   const [fertilizer, setFertilizer] = useState(0);
-  const [plots, setPlots] = useState<Plot[]>([{ crop: 'carrot', state: 'ready' }, { crop: 'wheat', state: 'ready' }, { crop: 'tomato', state: 'water' }, { crop: 'carrot', state: 'empty' }, { crop: 'wheat', state: 'empty', locked: 'Nivel 6' }, { crop: 'tomato', state: 'empty', locked: 'Invita 1 amigo' }, { crop: 'carrot', state: 'empty', locked: 'Nivel 8' }, { crop: 'wheat', state: 'empty', locked: 'Invita 3 amigos' }, { crop: 'tomato', state: 'empty', locked: 'Nivel 10' }]);
+  const [plots, setPlots] = useState<Plot[]>([{ crop: 'carrot', state: 'ready' }, { crop: 'carrot', state: 'ready' }, { crop: 'carrot', state: 'water' }, { crop: 'carrot', state: 'empty' }, { crop: 'carrot', state: 'empty', locked: 'Nivel 6' }, { crop: 'carrot', state: 'empty', locked: 'Invita 1 amigo' }, { crop: 'carrot', state: 'empty', locked: 'Nivel 8' }, { crop: 'carrot', state: 'empty', locked: 'Invita 3 amigos' }, { crop: 'carrot', state: 'empty', locked: 'Nivel 10' }]);
   const [now, setNow] = useState(Date.now());
   const [harvested, setHarvested] = useState(0);
   const [watered, setWatered] = useState(0);
@@ -109,7 +107,7 @@ function PlantingBed({ plot, index }: { plot: Plot; index: number }) {
    {plot.state === 'growing' && <div className="plot-progress"><span style={{ width: `${pct}%` }} /></div>}
    <div className="bed-actions">
     {canPlant && slots.length < BED_CAPACITY && <Button variant="wood" className="bed-command" aria-label={`Sembrar todas en parcela ${index + 1}`} onClick={() => game.plant(index)}><Sprout /><span>Sembrar 9</span></Button>}
-    {plot.state !== 'empty' && <Button variant={plot.state === 'ready' ? 'farm' : 'wood'} className="bed-command" disabled={plot.state === 'growing'} aria-label={`${plot.state === 'ready' ? 'Cosechar' : 'Regar'} parcela ${index + 1}`} onClick={() => game.harvest(index)}>{plot.state === 'ready' ? <><Wheat /><span>Cosechar</span></> : plot.state === 'water' ? <><Droplets /><span>Regar</span></> : <span>{left}s</span>}</Button>}
+    {plot.state !== 'empty' && <Button variant={plot.state === 'ready' ? 'farm' : 'wood'} className="bed-command" disabled={plot.state === 'growing'} aria-label={`${plot.state === 'ready' ? 'Cosechar' : 'Regar'} parcela ${index + 1}`} onClick={() => game.harvest(index)}>{plot.state === 'ready' ? <><Sprout /><span>Cosechar</span></> : plot.state === 'water' ? <><Droplets /><span>Regar</span></> : <span>{left}s</span>}</Button>}
    </div>
  </div>;
 }
@@ -120,7 +118,7 @@ export function FarmHome() {
 }
 function Heading({ title, subtitle }: { title: string; subtitle: string }) { return <div className="sub-heading"><Button variant="tool" asChild aria-label="Volver a la finca"><Link to="/"><ArrowLeft /></Link></Button><div><h2>{title}</h2><p>{subtitle}</p></div></div>; }
 export function ShopScreen() {
- const game = useGame(); const items = [{ name: 'Regadera estrella', price: 120, image: watering, text: 'Una compañera para tus cultivos.' }, { name: 'Espantapájaros', price: 200, image: scarecrow, text: 'Un nuevo vecino para la finquita.' }, { name: 'Semillas de zanahoria', price: 40, image: carrot, text: 'El cultivo favorito de Tito.' }, { name: 'Semillas de trigo', price: 60, image: wheat, text: 'Espigas doradas para tu finca.' }, { name: 'Semillas de tomate', price: 80, image: tomato, text: 'Un toque de color en tu huerto.' }, { name: 'Pozo rústico', price: 350, image: well, text: 'Una pieza especial para tu colección.' }];
+ const game = useGame(); const items = [{ name: 'Regadera estrella', price: 120, image: watering, text: 'Una compañera para tus cultivos.' }, { name: 'Espantapájaros', price: 200, image: scarecrow, text: 'Un nuevo vecino para la finquita.' }, { name: 'Semillas de zanahoria', price: 40, image: carrot, text: 'El cultivo favorito de Tito.' }, { name: 'Semillas gigantes de zanahoria', price: 90, image: carrot, text: 'Zanahorias extra grandes para tu huerto.' }, { name: 'Pozo rústico', price: 350, image: well, text: 'Una pieza especial para tu colección.' }];
  return <FarmShell active="/tienda"><div className="sub-page"><Heading title="La tienda de Tito" subtitle={`${game.carrots.toLocaleString('en-US')} zanahorias · ${game.bought.length} objetos en tu mochila de prueba`} /><div className="shop-grid">{items.map(item => <article key={item.name} className="shop-item"><h3>{item.name}</h3><img src={item.image} alt={item.name} /><p>{item.text}</p><div className="price"><img src={carrot} alt="Zanahorias" /> {item.price}</div><Button variant="farm" disabled={game.bought.includes(item.name)} onClick={() => game.buy(item.name, item.price)}>{game.bought.includes(item.name) ? <><Check /> En tu mochila</> : <><ShoppingBasket /> Comprar</>}</Button></article>)}</div></div></FarmShell>;
 }
 export function MissionsScreen() { const game = useGame(); const completed = [game.harvested >= 2, game.watered >= 3, game.invited >= 1].filter(Boolean).length; return <FarmShell active="/misiones"><div className="sub-page"><Heading title="Misiones del día" subtitle={`${completed} de 3 misiones completadas`} /><MissionRows large /><div className="bonus-band"><div><h3><Gift className="inline" /> Un extra de cariño</h3><p>Completa las 3 misiones · +100 zanahorias</p></div><Button variant="farm" disabled={completed < 3 || game.bonus} onClick={game.claim}>{game.bonus ? 'Recogido' : completed < 3 ? <><LockKeyhole /> {completed}/3</> : 'Recoger bono'}</Button></div></div></FarmShell>; }
