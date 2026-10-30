@@ -165,4 +165,43 @@ export function ShopScreen() {
  const game = useGame(); const items = [{ name: 'Regadera estrella', price: 120, image: watering, text: 'Una compañera para tus cultivos.' }, { name: 'Espantapájaros', price: 200, image: scarecrow, text: 'Un nuevo vecino para la finquita.' }, { name: 'Semillas de zanahoria', price: 40, image: carrot, text: 'El cultivo favorito de Tito.' }, { name: 'Semillas gigantes de zanahoria', price: 90, image: carrot, text: 'Zanahorias extra grandes para tu huerto.' }, { name: 'Pozo rústico', price: 350, image: well, text: 'Una pieza especial para tu colección.' }];
  return <FarmShell active="/tienda"><div className="sub-page"><Heading title="La tienda de Tito" subtitle={`${game.carrots.toLocaleString('en-US')} zanahorias · ${game.bought.length} objetos en tu mochila de prueba`} /><div className="shop-grid">{items.map(item => <article key={item.name} className="shop-item"><h3>{item.name}</h3><img src={item.image} alt={item.name} /><p>{item.text}</p><div className="price"><img src={carrot} alt="Zanahorias" /> {item.price}</div><Button variant="farm" disabled={game.bought.includes(item.name)} onClick={() => game.buy(item.name, item.price)}>{game.bought.includes(item.name) ? <><Check /> En tu mochila</> : <><ShoppingBasket /> Comprar</>}</Button></article>)}</div></div></FarmShell>;
 }
-export function MissionsScreen() { const game = useGame(); const completed = [game.harvested >= 2, game.watered >= 3, game.invited >= 1].filter(Boolean).length;
+export function MissionsScreen() { const game = useGame(); const completed = [game.harvested >= 2, game.watered >= 3, game.invited >= 1].filter(Boolean).length; return <FarmShell active="/misiones"><div className="sub-page"><Heading title="Misiones del día" subtitle={`${completed} de 3 misiones completadas`} /><MissionRows large /><div className="bonus-band"><div><h3><Gift className="inline" /> Un extra de cariño</h3><p>Completa las 3 misiones · +100 zanahorias</p></div><Button variant="farm" disabled={completed < 3 || game.bonus} onClick={game.claim}>{game.bonus ? 'Recogido' : completed < 3 ? <><LockKeyhole /> {completed}/3</> : 'Recoger bono'}</Button></div></div></FarmShell>; }
+export function FriendsScreen() { const game = useGame(); const copy = async () => { try { await navigator.clipboard.writeText(`${window.location.origin}/?invita=tito`); game.toast('Enlace de prueba copiado. Las invitaciones aún no están conectadas.'); } catch { game.toast('No se pudo copiar el enlace en este navegador.'); } }; return <FarmShell active="/amigos"><div className="sub-page"><Heading title="La finca es mejor juntos" subtitle="Un lugar para compartir con tus amigos." /><div className="friends-feature"><img src={tito} alt="Tito te da la bienvenida" /><div><h3>¡Que crezca la amistad!</h3><p>Una pequeña invitación para una gran aventura.</p><Button variant="farm" onClick={copy}><Copy /> Copiar enlace de prueba</Button></div></div><div className="friend-list"><h3 className="sidebar-title"><Users size={22} /> Tus amigos</h3><p className="friend-empty">Todavía no hay amigos en tu finca.</p><p className="notice">Las invitaciones reales no están conectadas. Puedes probar la misión sin enviar ningún mensaje.</p><Button variant="wood" onClick={game.invite}><Plus /> Probar invitación</Button></div></div></FarmShell>; }
+
+// Pantalla del Pozo integrada con anuncios limitados para conseguir agua y zanahorias
+export function WellScreen() { 
+ const game = useGame(); 
+ return <FarmShell active="/">
+   <div className="sub-page">
+     <Heading title="El pozo de la finca" subtitle="Agua fresca y recursos para tus pequeños cultivos." />
+     <div className="water-screen">
+       <img className="water-illustration" src={well} alt="Pozo de madera y piedra con agua fresca" />
+       <h3>{game.water} de 3 cubos disponibles</h3>
+       <div className="water-count">{[0,1,2].map(i => <Droplets key={i} className={i >= game.water ? 'used' : ''} />)}</div>
+       <p>Tito ha preparado agua para el huerto.</p>
+       
+       <Button variant="farm" disabled={game.water === 3} onClick={game.collect}>
+         <Droplets /> {game.water === 3 ? 'Tus cubos están llenos' : 'Rellenar cubos gratuitos'}
+       </Button>
+
+       <div className="mt-6 p-4 bg-black/20 rounded-xl space-y-3 border border-white/10">
+         <h4 className="font-bold text-white">📺 Obtener recursos extra con anuncios</h4>
+         <p className="text-xs text-gray-300">Anuncios vistos hoy: {game.adsWatchedToday} / 5 (Límite para cuidar la economía)</p>
+         
+         <div className="flex gap-2">
+           <Button variant="wood" className="flex-1" onClick={() => game.watchAdForResource('water')} disabled={game.adsWatchedToday >= 5}>
+             Ver anuncio (+1 Agua)
+           </Button>
+           <Button variant="wood" className="flex-1" onClick={() => game.watchAdForResource('carrot')} disabled={game.adsWatchedToday >= 5}>
+             Ver anuncio (+25 Zanahorias)
+           </Button>
+         </div>
+       </div>
+
+       <p className="notice">Sistema económico sostenible activo. Los anuncios tienen un tope diario.</p>
+     </div>
+   </div>
+ </FarmShell>; 
+}
+
+export function MarketScreen() { const game = useGame(); return <FarmShell active="/mercado"><div className="sub-page"><Heading title="El mercado de la cosecha" subtitle="Cada zanahoria cuenta una pequeña historia." /><div className="market-balance"><img src={carrot} alt="Zanahorias cosechadas" /><div><p>Tu cosecha de prueba</p><strong>{game.carrots.toLocaleString('en-US')}</strong><p>zanahorias</p></div></div><div className="notice">Esta es una vista de prueba. Las zanahorias no tienen valor monetario. No hay conexión de billeteras ni retiros reales.</div><Button variant="wood" disabled><LockKeyhole /> Retiros no disponibles</Button><Button variant="farm" asChild className="ml-3"><Link to="/"><Sprout /> Volver a cultivar</Link></Button></div></FarmShell>; }
