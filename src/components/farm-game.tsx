@@ -100,7 +100,7 @@ export function FarmProvider({ children }: { children: ReactNode }) {
   const spin = () => { if (spins < 1) return ''; setSpins(v => v - 1); const p = prizes[Math.floor(Math.random() * prizes.length)] ?? prizes[4]; if (!p) return ''; p.run(); setMessage(`Ruleta: ${p.label}`); return p.label; };
   return <GameContext.Provider value={{ now, carrots, coins, water, fertilizer, plots, harvested, watered, invited, bought, bonus, spins, chestAt, discount, ads, toast: setMessage, harvest, plant, buy, ad, spin,
     collect: () => { setWater(3); setMessage('¡Tus 3 baldes de agua están listos!'); },
-    invite: () => { setInvited(1); setPlots(v => v.map(p => p.locked === 'Invita 1 amigo' ? { ...p, locked: undefined } : p)); setMessage('Invitación de prueba preparada. ¡Un surco se ha desbloqueado!'); },
+    invite: () => { setInvited(v => v + 1); setPlots(v => v.map(p => p.locked === 'Invita 1 amigo' ? { ...p, locked: undefined } : p)); setMessage('¡Un amigo se unió a la finca!'); },
     claim: () => { if (harvested < 2 || watered < 3 || invited < 1 || bonus) return; setBonus(true); setCarrots(v => v + 100); setMessage('¡Bono recogido! +100 zanahorias'); },
     openChest: () => { if (chestAt > Date.now()) return; ad('Cofre abierto: +60 zanahorias', () => setCarrots(v => v + 60)); setChestAt(Date.now() + 6 * 3600 * 1000); },
     buyFertilizer: () => { if (carrots < 200) { setMessage('No tienes suficientes zanahorias.'); return; } setCarrots(v => v - 200); setFertilizer(v => v + 1); setMessage('+1 fertilizante: crece en la mitad de tiempo.'); },
@@ -152,7 +152,45 @@ export function ShopScreen() {
  return <FarmShell active="/tienda"><div className="sub-page"><Heading title="La tienda de Tito" subtitle={`${game.carrots.toLocaleString('en-US')} zanahorias · ${game.bought.length} objetos en tu mochila de prueba`} /><div className="shop-grid">{items.map(item => <article key={item.name} className="shop-item"><h3>{item.name}</h3><img src={item.image} alt={item.name} /><p>{item.text}</p><div className="price"><img src={carrot} alt="Zanahorias" /> {item.price}</div><Button variant="farm" disabled={game.bought.includes(item.name)} onClick={() => game.buy(item.name, item.price)}>{game.bought.includes(item.name) ? <><Check /> En tu mochila</> : <><ShoppingBasket /> Comprar</>}</Button></article>)}</div></div></FarmShell>;
 }
 export function MissionsScreen() { const game = useGame(); const completed = [game.harvested >= 2, game.watered >= 3, game.invited >= 1].filter(Boolean).length; return <FarmShell active="/misiones"><div className="sub-page"><Heading title="Misiones del día" subtitle={`${completed} de 3 misiones completadas`} /><MissionRows large /><div className="bonus-band"><div><h3><Gift className="inline" /> Un extra de cariño</h3><p>Completa las 3 misiones · +100 zanahorias</p></div><Button variant="farm" disabled={completed < 3 || game.bonus} onClick={game.claim}>{game.bonus ? 'Recogido' : completed < 3 ? <><LockKeyhole /> {completed}/3</> : 'Recoger bono'}</Button></div></div></FarmShell>; }
-export function FriendsScreen() { const game = useGame(); const copy = async () => { try { await navigator.clipboard.writeText(`${window.location.origin}/?invita=tito`); game.toast('Enlace de prueba copiado. Las invitaciones aún no están conectadas.'); } catch { game.toast('No se pudo copiar el enlace en este navegador.'); } }; return <FarmShell active="/amigos"><div className="sub-page"><Heading title="La finca es mejor juntos" subtitle="Un lugar para compartir con tus amigos." /><div className="friends-feature"><img src={tito} alt="Tito te da la bienvenida" /><div><h3>¡Que crezca la amistad!</h3><p>Una pequeña invitación para una gran aventura.</p><Button variant="farm" onClick={copy}><Copy /> Copiar enlace de prueba</Button></div></div><div className="friend-list"><h3 className="sidebar-title"><Users size={22} /> Tus amigos</h3><p className="friend-empty">Todavía no hay amigos en tu finca.</p><p className="notice">Las invitaciones reales no están conectadas. Puedes probar la misión sin enviar ningún mensaje.</p><Button variant="wood" onClick={game.invite}><Plus /> Probar invitación</Button></div></div></FarmShell>; }
+
+export function FriendsScreen() { 
+  const game = useGame(); 
+  const REWARD_PER_FRIEND = 1000; 
+
+  const copy = async () => { 
+    try { 
+      await navigator.clipboard.writeText(`${window.location.origin}/?invita=tito`); 
+      game.toast('¡Enlace copiado! Compártelo para ganar zanahorias.'); 
+    } catch { 
+      game.toast('No se pudo copiar el enlace en este navegador.'); 
+    } 
+  }; 
+
+  return <FarmShell active="/amigos"><div className="sub-page"><Heading title="La finca es mejor juntos" subtitle="Invita a tus amigos y ganen recompensas reales." />
+  
+  <div className="friends-feature">
+    <img src={tito} alt="Tito te da la bienvenida" />
+    <div>
+      <h3>¡Gana {REWARD_PER_FRIEND.toLocaleString('en-US')} zanahorias!</h3>
+      <p>Por cada amigo que entre a la app usando tu enlace de referido.</p>
+      <Button variant="farm" onClick={copy}><Copy /> Copiar enlace</Button>
+    </div>
+  </div>
+  
+  <div className="friend-list">
+    <h3 className="sidebar-title"><Users size={22} /> Tus amigos referidos</h3>
+    <p className="friend-empty">Todavía no has invitado a nadie.</p>
+    <p className="notice">Cuando tus amigos entren, aparecerán aquí y recibirás tu recompensa.</p>
+    <Button variant="wood" onClick={() => {
+      game.invite();
+      game.earn(REWARD_PER_FRIEND); 
+      game.toast(`¡Un amigo se ha unido! +${REWARD_PER_FRIEND.toLocaleString('en-US')} zanahorias.`);
+    }}>
+      <Plus /> Simular invitación (+1k Zanahorias)
+    </Button>
+  </div></div></FarmShell>; 
+}
+
 export function WellScreen() { 
   const game = useGame(); 
   return <FarmShell active="/"><div className="sub-page"><Heading title="El pozo de la finca" subtitle="Agua fresca para tus pequeños cultivos." /><div className="water-screen"><img className="water-illustration" src={well} alt="Pozo de madera y piedra con agua fresca" /><h3>{game.water} de 3 cubos disponibles</h3><div className="water-count">{[0,1,2].map(i => <Droplets key={i} className={i >= game.water ? 'used' : ''} />)}</div><p>Tito ha preparado agua para el huerto.</p><Button variant="farm" disabled={game.water === 3} onClick={game.collect}><Droplets /> {game.water === 3 ? 'Tus cubos están llenos' : 'Rellenar cubos de prueba'}</Button>
