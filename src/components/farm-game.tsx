@@ -215,28 +215,36 @@ export function MarketScreen() {
       <div className="sub-page">
         <Heading title="El mercado de la cosecha" subtitle="Convierte tus zanahorias de esfuerzo en dinero real." />
         
-        <div className="market-balance bg-black/30 p-6 rounded-2xl border border-cyan-500/30 text-center space-y-2">
-          <img src={carrot} alt="Zanahorias cosechadas" className="w-16 h-16 mx-auto" />
-          <p className="text-gray-300">Tu balance actual</p>
-          <strong className="text-3xl text-cyan-400">{game.carrots.toLocaleString('en-US')}</strong>
-          <p className="text-sm text-gray-400">zanahorias</p>
-          <div className="mt-4 pt-4 border-t border-white/10">
-            <span className="text-xs text-pink-400 uppercase tracking-wider font-bold">Valor Estimado en USD</span>
-            <div className="text-2xl font-extrabold text-white">${usdValue} USD</div>
-            <small className="text-gray-400">Tasa oficial: 100,000 Zanahorias = $1.00 USD</small>
+        {/* Tarjeta original restaurada (usa tu styles.css intacto) */}
+        <div className="market-balance">
+          <img src={carrot} alt="Zanahorias cosechadas" />
+          <div>
+            <p>Tu balance actual</p>
+            <strong>{game.carrots.toLocaleString('en-US')}</strong>
+            <p>zanahorias</p>
           </div>
         </div>
 
-        <div className="mt-6 p-4 bg-white/5 rounded-xl space-y-3">
-          <h4 className="font-bold text-white">💰 Sistema de Retiros</h4>
-          <p className="text-xs text-gray-300">Mínimo para retirar: <strong>$5.00 USD</strong> (500,000 zanahorias). Sigue viendo anuncios y cultivando para alcanzar la meta.</p>
+        {/* Nueva tarjeta estilizada para el valor en USD */}
+        <div className="mt-4 p-5 bg-[#1a1a24]/80 rounded-2xl border border-cyan-500/30 text-center shadow-xl backdrop-blur-sm">
+          <span className="text-xs text-pink-400 uppercase tracking-widest font-bold">Valor Estimado en USD</span>
+          <div className="text-3xl font-extrabold text-white mt-2 mb-1">${usdValue} USD</div>
+          <small className="text-gray-400">Tasa oficial: 100,000 Zanahorias = $1.00 USD</small>
+        </div>
+
+        {/* Tarjeta de Retiros */}
+        <div className="mt-6 p-5 bg-white/5 rounded-2xl border border-white/10 space-y-3 text-center">
+          <h4 className="font-bold text-white text-lg">💰 Sistema de Retiros</h4>
+          <p className="text-sm text-gray-300">
+            Mínimo para retirar: <strong>$5.00 USD</strong> (500,000 zanahorias).
+          </p>
           
           <Button 
             variant="farm" 
-            className="w-full" 
+            className="w-full mt-2" 
             onClick={handleWithdrawRequest}
           >
-            {currentUSDNum >= minWithdrawUSD ? '🚀 Solicitar Retiro Real' : `Faltan $${(minWithdrawUSD - currentUSDNum).toFixed(2)} para retirar`}
+            {currentUSDNum >= minWithdrawUSD ? '🚀 Solicitar Retiro Real' : `Faltan $${(minWithdrawUSD - currentUSDNum).toFixed(2)}`}
           </Button>
         </div>
 
@@ -249,3 +257,4 @@ export function MarketScreen() {
     </FarmShell>
   ); 
 }
+
