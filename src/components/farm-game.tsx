@@ -14,13 +14,14 @@ import plantedCarrot from '@/assets/planted-carrot.png';
 import plantingBed from '@/assets/planting-bed.png';
 
 type Plot = { crop: 'carrot'; state: 'ready' | 'water' | 'empty' | 'growing'; end?: number; start?: number; locked?: string | undefined; slots?: number[] };
-type Game = { now: number; carrots: number; coins: number; water: number; fertilizer: number; plots: Plot[]; harvested: number; watered: number; invited: number; bought: string[]; bonus: boolean; spins: number; chestAt: number; discount: boolean; ads: number; toast: (message: string) => void; harvest: (index: number) => void; plant: (index: number, slot?: number) => void; buy: (name: string, price: number) => void; collect: () => void; invite: () => void; claim: () => void; ad: (reason: string, reward: () => void) => void; spin: () => string; openChest: () => void; buyFertilizer: () => void; unlockDiscount: () => void; earn: (n: number) => void; addWater: (n: number) => void; addFertilizer: (n: number) => void; addSpin: () => void };
+type Game = { now: number; carrots: number; coins: number; water: number; fertilizer: number; plots: Plot[]; harvested: number; watered: number; invited: number; bought: string[]; bonus: boolean; spins: number; chestAt: number; discount: boolean; ads: number; toast: (message: string) => void; harvest: (index: number) => void; plant: (index: number, slot?: number) => void; buy: (name: string, price: number) => void; collect: () => void; invite: () => void; claim: () => void; ad: (reason: string, reward: () => void) => void; spin: () => string; openChest: () => void; buyFertilizer: () => void; unlockDiscount: () => void; earn: (n: number) => void; addWater: (n: number) => void; addFertilizer: (n: number) => void; addSpin: () => void; watchAdForResource: (type: 'carrot' | 'water') => void; adsWatchedToday: number };
 const GameContext = createContext<Game | null>(null);
 function useGame() { const game = useContext(GameContext); if (!game) throw new Error('Farm provider missing'); return game; }
 const cropImages = { carrot: plantedCarrot };
 export const farmMeta = (title: string, description: string) => ({ meta: [{ title: `${title} · Mi Finquita del Conejo` }, { name: 'description', content: description }, { property: 'og:title', content: `${title} · Mi Finquita del Conejo` }, { property: 'og:description', content: description }, { property: 'og:type', content: 'website' }, { name: 'twitter:card', content: 'summary_large_image' }] });
 export const dayEvents = ['Domingo de feria · ventas x1.5', 'Lunes de lluvia · todo crece x2', 'Martes tranquilo', 'Miércoles de plaga · protege con espantapájaros', 'Jueves soleado', 'Viernes de cosecha', 'Sábado de mercado'];
 const UPGRADED = 'Regadera mejorada';
+const MAX_ADS_PER_DAY = 5; // Límite estricto económico para proteger la economía del juego
 
 export function FarmProvider({ children }: { children: ReactNode }) {
   const [carrots, setCarrots] = useState(1234);
@@ -38,17 +39,58 @@ export function FarmProvider({ children }: { children: ReactNode }) {
   const [chestAt, setChestAt] = useState(0);
   const [discount, setDiscount] = useState(false);
   const [ads, setAds] = useState(0);
+  const [adsWatchedToday, setAdsWatchedToday] = useState(0);
   const [message, setMessage] = useState('');
+
   useEffect(() => { if (!message) return; const timer = setTimeout(() => setMessage(''), 3400); return () => clearTimeout(timer); }, [message]);
   useEffect(() => { const timer = setInterval(() => { setNow(Date.now()); setPlots(current => current.map(p => p.state === 'growing' && p.end && p.end <= Date.now() ? { ...p, state: 'ready' } : p)); }, 1000); return () => clearInterval(timer); }, []);
+  
   const rain = new Date().getDay() === 1;
+
+  // Lógica de Anuncios Sostenible con Gigapub y Límites Diarios
+  const watchAdForResource = (type: 'carrot' | 'water') => {
+    if (adsWatchedToday >= MAX_ADS_PER_DAY) {
+      setMessage(`Has alcanzado el límite de ${MAX_ADS_PER_DAY} anuncios diarios para proteger la economía del juego.`);
+      return;
+    }
+
+    if (typeof window !== 'undefined' && (window as any).showGiga) {
+      (window as any).showGiga()
+        .then(() => {
+          setAdsWatchedToday(v => v + 1);
+          setAds(v => v + 1);
+          if (type === 'carrot') {
+            setCarrots(v => v + 25);
+            setMessage('¡Anuncio visto! +25 zanahorias añadidas a tu inventario.');
+          } else {
+            setWater(v => Math.min(3, v + 1));
+            setMessage('¡Anuncio visto! +1 balde de agua rellenado.');
+          }
+        })
+        .catch((e: any) => {
+          console.error("Anuncio no completado", e);
+          setMessage('El anuncio fue cerrado antes de completarse.');
+        });
+    } else {
+      // Modo simulación si el script de Gigapub no está cargado en entorno local
+      setAdsWatchedToday(v => v + 1);
+      if (type === 'carrot') {
+        setCarrots(v => v + 25);
+        setMessage('(Simulación) Anuncio visto · +25 zanahorias');
+      } else {
+        setWater(v => Math.min(3, v + 1));
+        setMessage('(Simulación) Anuncio visto · +1 balde de agua');
+      }
+    }
+  };
+
   const harvest = (index: number) => {
     const plot = plots[index]; if (!plot) return;
     if (plot.locked) { setMessage(`Surco bloqueado · ${plot.locked}. ¡Sigue jugando para abrirlo!`); return; }
     if (plot.state === 'ready') { const gain = bought.includes(UPGRADED) ? 44 : 40; setCarrots(v => v + gain); setCoins(v => v + 25); setHarvested(v => v + 1); setPlots(v => v.map((p, i) => i === index ? { ...p, state: 'empty', slots: [] } : p)); setMessage(`¡Buena cosecha! +${gain} zanahorias y +25 monedas`); }
     else if (plot.state === 'empty') plant(index);
     else if (plot.state === 'water') {
-      if (water === 0) { setMessage('No quedan baldes. Visita el pozo.'); return; }
+      if (water === 0) { setMessage('No quedan baldes. Visita el pozo o mira un anuncio.'); return; }
       let secs = rain ? 15 : 30; const useFert = fertilizer > 0; if (useFert) { secs = Math.ceil(secs / 2); setFertilizer(v => v - 1); }
       const double = bought.includes(UPGRADED);
       const targets = double ? [index, plots.findIndex((p, i) => i !== index && p.state === 'water')].filter(i => i >= 0) : [index];
@@ -68,6 +110,7 @@ export function FarmProvider({ children }: { children: ReactNode }) {
   const ad = (reason: string, reward: () => void) => { setAds(v => v + 1); reward(); setMessage(`Anuncio de prueba visto · ${reason}`); };
   const prizes = [{ label: '10 zanahorias', run: () => setCarrots(v => v + 10) }, { label: '50 zanahorias', run: () => setCarrots(v => v + 50) }, { label: '1 balde de agua', run: () => setWater(v => v + 1) }, { label: '1 fertilizante', run: () => setFertilizer(v => v + 1) }, { label: 'Gracias por jugar', run: () => {} }];
   const spin = () => { if (spins < 1) return ''; setSpins(v => v - 1); const p = prizes[Math.floor(Math.random() * prizes.length)] ?? prizes[4]; if (!p) return ''; p.run(); setMessage(`Ruleta: ${p.label}`); return p.label; };
+  
   return <GameContext.Provider value={{ now, carrots, coins, water, fertilizer, plots, harvested, watered, invited, bought, bonus, spins, chestAt, discount, ads, toast: setMessage, harvest, plant, buy, ad, spin,
     collect: () => { setWater(3); setMessage('¡Tus 3 baldes de agua están listos!'); },
     invite: () => { setInvited(1); setPlots(v => v.map(p => p.locked === 'Invita 1 amigo' ? { ...p, locked: undefined } : p)); setMessage('Invitación de prueba preparada. ¡Un surco se ha desbloqueado!'); },
@@ -75,7 +118,8 @@ export function FarmProvider({ children }: { children: ReactNode }) {
     openChest: () => { if (chestAt > Date.now()) return; ad('Cofre abierto: +60 zanahorias', () => setCarrots(v => v + 60)); setChestAt(Date.now() + 6 * 3600 * 1000); },
     buyFertilizer: () => { if (carrots < 200) { setMessage('No tienes suficientes zanahorias.'); return; } setCarrots(v => v - 200); setFertilizer(v => v + 1); setMessage('+1 fertilizante: crece en la mitad de tiempo.'); },
     unlockDiscount: () => ad('Oferta 50% en la regadera desbloqueada', () => setDiscount(true)),
-    earn: n => setCarrots(v => v + n), addWater: n => setWater(v => v + n), addFertilizer: n => setFertilizer(v => v + n), addSpin: () => setSpins(v => v + 1) }}>{children}{message && <div role="status" className="toast-game">{message}</div>}</GameContext.Provider>;
+    earn: n => setCarrots(v => v + n), addWater: n => setWater(v => v + n), addFertilizer: n => setFertilizer(v => v + n), addSpin: () => setSpins(v => v + 1),
+    watchAdForResource, adsWatchedToday }}>{children}{message && <div role="status" className="toast-game">{message}</div>}</GameContext.Provider>;
 }
 
 const navItems = [{ path: '/' as const, label: 'Finca', icon: House }, { path: '/tienda' as const, label: 'Tienda', icon: ShoppingBasket }, { path: '/misiones' as const, label: 'Misiones', icon: ClipboardList }, { path: '/amigos' as const, label: 'Amigos', icon: Users }, { path: '/mercado' as const, label: 'Mercado', icon: Coins }];
@@ -121,7 +165,4 @@ export function ShopScreen() {
  const game = useGame(); const items = [{ name: 'Regadera estrella', price: 120, image: watering, text: 'Una compañera para tus cultivos.' }, { name: 'Espantapájaros', price: 200, image: scarecrow, text: 'Un nuevo vecino para la finquita.' }, { name: 'Semillas de zanahoria', price: 40, image: carrot, text: 'El cultivo favorito de Tito.' }, { name: 'Semillas gigantes de zanahoria', price: 90, image: carrot, text: 'Zanahorias extra grandes para tu huerto.' }, { name: 'Pozo rústico', price: 350, image: well, text: 'Una pieza especial para tu colección.' }];
  return <FarmShell active="/tienda"><div className="sub-page"><Heading title="La tienda de Tito" subtitle={`${game.carrots.toLocaleString('en-US')} zanahorias · ${game.bought.length} objetos en tu mochila de prueba`} /><div className="shop-grid">{items.map(item => <article key={item.name} className="shop-item"><h3>{item.name}</h3><img src={item.image} alt={item.name} /><p>{item.text}</p><div className="price"><img src={carrot} alt="Zanahorias" /> {item.price}</div><Button variant="farm" disabled={game.bought.includes(item.name)} onClick={() => game.buy(item.name, item.price)}>{game.bought.includes(item.name) ? <><Check /> En tu mochila</> : <><ShoppingBasket /> Comprar</>}</Button></article>)}</div></div></FarmShell>;
 }
-export function MissionsScreen() { const game = useGame(); const completed = [game.harvested >= 2, game.watered >= 3, game.invited >= 1].filter(Boolean).length; return <FarmShell active="/misiones"><div className="sub-page"><Heading title="Misiones del día" subtitle={`${completed} de 3 misiones completadas`} /><MissionRows large /><div className="bonus-band"><div><h3><Gift className="inline" /> Un extra de cariño</h3><p>Completa las 3 misiones · +100 zanahorias</p></div><Button variant="farm" disabled={completed < 3 || game.bonus} onClick={game.claim}>{game.bonus ? 'Recogido' : completed < 3 ? <><LockKeyhole /> {completed}/3</> : 'Recoger bono'}</Button></div></div></FarmShell>; }
-export function FriendsScreen() { const game = useGame(); const copy = async () => { try { await navigator.clipboard.writeText(`${window.location.origin}/?invita=tito`); game.toast('Enlace de prueba copiado. Las invitaciones aún no están conectadas.'); } catch { game.toast('No se pudo copiar el enlace en este navegador.'); } }; return <FarmShell active="/amigos"><div className="sub-page"><Heading title="La finca es mejor juntos" subtitle="Un lugar para compartir con tus amigos." /><div className="friends-feature"><img src={tito} alt="Tito te da la bienvenida" /><div><h3>¡Que crezca la amistad!</h3><p>Una pequeña invitación para una gran aventura.</p><Button variant="farm" onClick={copy}><Copy /> Copiar enlace de prueba</Button></div></div><div className="friend-list"><h3 className="sidebar-title"><Users size={22} /> Tus amigos</h3><p className="friend-empty">Todavía no hay amigos en tu finca.</p><p className="notice">Las invitaciones reales no están conectadas. Puedes probar la misión sin enviar ningún mensaje.</p><Button variant="wood" onClick={game.invite}><Plus /> Probar invitación</Button></div></div></FarmShell>; }
-export function WellScreen() { const game = useGame(); return <FarmShell active="/"><div className="sub-page"><Heading title="El pozo de la finca" subtitle="Agua fresca para tus pequeños cultivos." /><div className="water-screen"><img className="water-illustration" src={well} alt="Pozo de madera y piedra con agua fresca" /><h3>{game.water} de 3 cubos disponibles</h3><div className="water-count">{[0,1,2].map(i => <Droplets key={i} className={i >= game.water ? 'used' : ''} />)}</div><p>Tito ha preparado agua para el huerto.</p><Button variant="farm" disabled={game.water === 3} onClick={game.collect}><Droplets /> {game.water === 3 ? 'Tus cubos están llenos' : 'Rellenar cubos de prueba'}</Button><p className="notice">Recarga gratuita de prueba. No hay anuncios ni compras conectadas.</p></div></div></FarmShell>; }
-export function MarketScreen() { const game = useGame(); return <FarmShell active="/mercado"><div className="sub-page"><Heading title="El mercado de la cosecha" subtitle="Cada zanahoria cuenta una pequeña historia." /><div className="market-balance"><img src={carrot} alt="Zanahorias cosechadas" /><div><p>Tu cosecha de prueba</p><strong>{game.carrots.toLocaleString('en-US')}</strong><p>zanahorias</p></div></div><div className="notice">Esta es una vista de prueba. Las zanahorias no tienen valor monetario. No hay conexión de billeteras ni retiros reales.</div><Button variant="wood" disabled><LockKeyhole /> Retiros no disponibles</Button><Button variant="farm" asChild className="ml-3"><Link to="/"><Sprout /> Volver a cultivar</Link></Button></div></FarmShell>; }
+export function MissionsScreen() { const game = useGame(); const completed = [game.harvested >= 2, game.watered >= 3, game.invited >= 1].filter(Boolean).length;
