@@ -1,3 +1,4 @@
+Src/components/farm-game.tsx
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import { Link } from '@tanstack/react-router';
 import { ArrowLeft, Check, ClipboardList, Coins, Copy, Droplets, Gem, Gift, House, Leaf, LockKeyhole, Mail, Plus, Settings, ShoppingBasket, Sprout, Star, Sun, Users, Volume2, VolumeX } from 'lucide-react';
@@ -14,7 +15,7 @@ import plantedCarrot from '@/assets/planted-carrot.png';
 import plantingBed from '@/assets/planting-bed.png';
 
 type Plot = { crop: 'carrot'; state: 'ready' | 'water' | 'empty' | 'growing'; end?: number; start?: number; locked?: string | undefined; slots?: number[] };
-type Game = { now: number; carrots: number; coins: number; water: number; fertilizer: number; plots: Plot[]; harvested: number; watered: number; invited: number; bought: string[]; bonus: boolean; spins: number; chestAt: number; discount: boolean; ads: number; toast: (message: string) => void; harvest: (index: number) => void; plant: (index: number, slot?: number) => void; buy: (name: string, price: number) => void; collect: () => void; invite: () => void; claim: () => void; ad: (reason: string, reward: () => void) => void; spin: () => string; openChest: () => void; buyFertilizer: () => void; unlockDiscount: () => void; earn: (n: number) => void; addWater: (n: number) => void; addFertilizer: (n: number) => void; addSpin: () => void; watchAdForResource: (type: 'carrot' | 'water') => void };
+type Game = { now: number; carrots: number; coins: number; water: number; fertilizer: number; plots: Plot[]; harvested: number; watered: number; invited: number; bought: string[]; bonus: boolean; spins: number; chestAt: number; discount: boolean; ads: number; toast: (message: string) => void; harvest: (index: number) => void; plant: (index: number, slot?: number) => void; buy: (name: string, price: number) => void; collect: () => void; invite: () => void; claim: () => void; ad: (reason: string, reward: () => void) => void; spin: () => string; openChest: () => void; buyFertilizer: () => void; unlockDiscount: () => void; earn: (n: number) => void; addWater: (n: number) => void; addFertilizer: (n: number) => void; addSpin: () => void };
 const GameContext = createContext<Game | null>(null);
 function useGame() { const game = useContext(GameContext); if (!game) throw new Error('Farm provider missing'); return game; }
 const cropImages = { carrot: plantedCarrot };
@@ -39,50 +40,16 @@ export function FarmProvider({ children }: { children: ReactNode }) {
   const [discount, setDiscount] = useState(false);
   const [ads, setAds] = useState(0);
   const [message, setMessage] = useState('');
-
   useEffect(() => { if (!message) return; const timer = setTimeout(() => setMessage(''), 3400); return () => clearTimeout(timer); }, [message]);
   useEffect(() => { const timer = setInterval(() => { setNow(Date.now()); setPlots(current => current.map(p => p.state === 'growing' && p.end && p.end <= Date.now() ? { ...p, state: 'ready' } : p)); }, 1000); return () => clearInterval(timer); }, []);
-  
   const rain = new Date().getDay() === 1;
-
-  // Lógica de Anuncios Libres para minería/conversión
-  const watchAdForResource = (type: 'carrot' | 'water') => {
-    if (typeof window !== 'undefined' && (window as any).showGiga) {
-      (window as any).showGiga()
-        .then(() => {
-          setAds(v => v + 1);
-          if (type === 'carrot') {
-            setCarrots(v => v + 500); 
-            setMessage('¡Anuncio completado! +500 zanahorias añadidas.');
-          } else {
-            setWater(v => Math.min(3, v + 1));
-            setMessage('¡Anuncio completado! +1 balde de agua.');
-          }
-        })
-        .catch((e: any) => {
-          console.error("Anuncio no completado", e);
-          setMessage('El anuncio fue cerrado antes de finalizar.');
-        });
-    } else {
-      // Simulación local
-      setAds(v => v + 1);
-      if (type === 'carrot') {
-        setCarrots(v => v + 500);
-        setMessage('(Simulación) +500 zanahorias por anuncio');
-      } else {
-        setWater(v => Math.min(3, v + 1));
-        setMessage('(Simulación) +1 balde de agua por anuncio');
-      }
-    }
-  };
-
   const harvest = (index: number) => {
     const plot = plots[index]; if (!plot) return;
     if (plot.locked) { setMessage(`Surco bloqueado · ${plot.locked}. ¡Sigue jugando para abrirlo!`); return; }
     if (plot.state === 'ready') { const gain = bought.includes(UPGRADED) ? 44 : 40; setCarrots(v => v + gain); setCoins(v => v + 25); setHarvested(v => v + 1); setPlots(v => v.map((p, i) => i === index ? { ...p, state: 'empty', slots: [] } : p)); setMessage(`¡Buena cosecha! +${gain} zanahorias y +25 monedas`); }
     else if (plot.state === 'empty') plant(index);
     else if (plot.state === 'water') {
-      if (water === 0) { setMessage('No quedan baldes. Visita el pozo o mira un anuncio.'); return; }
+      if (water === 0) { setMessage('No quedan baldes. Visita el pozo.'); return; }
       let secs = rain ? 15 : 30; const useFert = fertilizer > 0; if (useFert) { secs = Math.ceil(secs / 2); setFertilizer(v => v - 1); }
       const double = bought.includes(UPGRADED);
       const targets = double ? [index, plots.findIndex((p, i) => i !== index && p.state === 'water')].filter(i => i >= 0) : [index];
@@ -102,7 +69,6 @@ export function FarmProvider({ children }: { children: ReactNode }) {
   const ad = (reason: string, reward: () => void) => { setAds(v => v + 1); reward(); setMessage(`Anuncio de prueba visto · ${reason}`); };
   const prizes = [{ label: '10 zanahorias', run: () => setCarrots(v => v + 10) }, { label: '50 zanahorias', run: () => setCarrots(v => v + 50) }, { label: '1 balde de agua', run: () => setWater(v => v + 1) }, { label: '1 fertilizante', run: () => setFertilizer(v => v + 1) }, { label: 'Gracias por jugar', run: () => {} }];
   const spin = () => { if (spins < 1) return ''; setSpins(v => v - 1); const p = prizes[Math.floor(Math.random() * prizes.length)] ?? prizes[4]; if (!p) return ''; p.run(); setMessage(`Ruleta: ${p.label}`); return p.label; };
-  
   return <GameContext.Provider value={{ now, carrots, coins, water, fertilizer, plots, harvested, watered, invited, bought, bonus, spins, chestAt, discount, ads, toast: setMessage, harvest, plant, buy, ad, spin,
     collect: () => { setWater(3); setMessage('¡Tus 3 baldes de agua están listos!'); },
     invite: () => { setInvited(1); setPlots(v => v.map(p => p.locked === 'Invita 1 amigo' ? { ...p, locked: undefined } : p)); setMessage('Invitación de prueba preparada. ¡Un surco se ha desbloqueado!'); },
@@ -110,8 +76,7 @@ export function FarmProvider({ children }: { children: ReactNode }) {
     openChest: () => { if (chestAt > Date.now()) return; ad('Cofre abierto: +60 zanahorias', () => setCarrots(v => v + 60)); setChestAt(Date.now() + 6 * 3600 * 1000); },
     buyFertilizer: () => { if (carrots < 200) { setMessage('No tienes suficientes zanahorias.'); return; } setCarrots(v => v - 200); setFertilizer(v => v + 1); setMessage('+1 fertilizante: crece en la mitad de tiempo.'); },
     unlockDiscount: () => ad('Oferta 50% en la regadera desbloqueada', () => setDiscount(true)),
-    earn: n => setCarrots(v => v + n), addWater: n => setWater(v => v + n), addFertilizer: n => setFertilizer(v => v + n), addSpin: () => setSpins(v => v + 1),
-    watchAdForResource }}>{children}{message && <div role="status" className="toast-game">{message}</div>}</GameContext.Provider>;
+    earn: n => setCarrots(v => v + n), addWater: n => setWater(v => v + n), addFertilizer: n => setFertilizer(v => v + n), addSpin: () => setSpins(v => v + 1) }}>{children}{message && <div role="status" className="toast-game">{message}</div>}</GameContext.Provider>;
 }
 
 const navItems = [{ path: '/' as const, label: 'Finca', icon: House }, { path: '/tienda' as const, label: 'Tienda', icon: ShoppingBasket }, { path: '/misiones' as const, label: 'Misiones', icon: ClipboardList }, { path: '/amigos' as const, label: 'Amigos', icon: Users }, { path: '/mercado' as const, label: 'Mercado', icon: Coins }];
@@ -159,102 +124,21 @@ export function ShopScreen() {
 }
 export function MissionsScreen() { const game = useGame(); const completed = [game.harvested >= 2, game.watered >= 3, game.invited >= 1].filter(Boolean).length; return <FarmShell active="/misiones"><div className="sub-page"><Heading title="Misiones del día" subtitle={`${completed} de 3 misiones completadas`} /><MissionRows large /><div className="bonus-band"><div><h3><Gift className="inline" /> Un extra de cariño</h3><p>Completa las 3 misiones · +100 zanahorias</p></div><Button variant="farm" disabled={completed < 3 || game.bonus} onClick={game.claim}>{game.bonus ? 'Recogido' : completed < 3 ? <><LockKeyhole /> {completed}/3</> : 'Recoger bono'}</Button></div></div></FarmShell>; }
 export function FriendsScreen() { const game = useGame(); const copy = async () => { try { await navigator.clipboard.writeText(`${window.location.origin}/?invita=tito`); game.toast('Enlace de prueba copiado. Las invitaciones aún no están conectadas.'); } catch { game.toast('No se pudo copiar el enlace en este navegador.'); } }; return <FarmShell active="/amigos"><div className="sub-page"><Heading title="La finca es mejor juntos" subtitle="Un lugar para compartir con tus amigos." /><div className="friends-feature"><img src={tito} alt="Tito te da la bienvenida" /><div><h3>¡Que crezca la amistad!</h3><p>Una pequeña invitación para una gran aventura.</p><Button variant="farm" onClick={copy}><Copy /> Copiar enlace de prueba</Button></div></div><div className="friend-list"><h3 className="sidebar-title"><Users size={22} /> Tus amigos</h3><p className="friend-empty">Todavía no hay amigos en tu finca.</p><p className="notice">Las invitaciones reales no están conectadas. Puedes probar la misión sin enviar ningún mensaje.</p><Button variant="wood" onClick={game.invite}><Plus /> Probar invitación</Button></div></div></FarmShell>; }
+export function WellScreen() { const game = useGame(); return <FarmShell active="/"><div className="sub-page"><Heading title="El pozo de la finca" subtitle="Agua fresca para tus pequeños cultivos." /><div className="water-screen"><img className="water-illustration" src={well} alt="Pozo de madera y piedra con agua fresca" /><h3>{game.water} de 3 cubos disponibles</h3><div className="water-count">{[0,1,2].map(i => <Droplets key={i} className={i >= game.water ? 'used' : ''} />)}</div><p>Tito ha preparado agua para el huerto.</p><Button variant="farm" disabled={game.water === 3} onClick={game.collect}><Droplets /> {game.water === 3 ? 'Tus cubos están llenos' : 'Rellenar cubos de prueba'}</Button><p className="notice">Recarga gratuita de prueba. No hay anuncios ni compras conectadas.</p></div></div></FarmShell>; }
+export function MarketScreen() { const game = useGame(); return <FarmShell active="/mercado"><div className="sub-page"><Heading title="El mercado de la cosecha" subtitle="Cada zanahoria cuenta una pequeña historia." /><div className="market-balance"><img src={carrot} alt="Zanahorias cosechadas" /><div><p>Tu cosecha de prueba</p><strong>{game.carrots.toLocaleString('en-US')}</strong><p>zanahorias</p></div></div><div className="notice">Esta es una vista de prueba. Las zanahorias no tienen valor monetario. No hay conexión de billeteras ni retiros reales.</div><Button variant="wood" disabled><LockKeyhole /> Retiros no disponibles</Button><Button variant="farm" asChild className="ml-3"><Link to="/"><Sprout /> Volver a cultivar</Link></Button></div></FarmShell>; }
 
-export function WellScreen() { 
- const game = useGame(); 
- return <FarmShell active="/">
-   <div className="sub-page">
-     <Heading title="El pozo de la finca" subtitle="Agua fresca y recursos para tus pequeños cultivos." />
-     <div className="water-screen">
-       <img className="water-illustration" src={well} alt="Pozo de madera y piedra con agua fresca" />
-       <h3>{game.water} de 3 cubos disponibles</h3>
-       <div className="water-count">{[0,1,2].map(i => <Droplets key={i} className={i >= game.water ? 'used' : ''} />)}</div>
-       <p>Tito ha preparado agua para el huerto.</p>
-       
-       <Button variant="farm" disabled={game.water === 3} onClick={game.collect}>
-         <Droplets /> {game.water === 3 ? 'Tus cubos están llenos' : 'Rellenar cubos gratuitos'}
-       </Button>
 
-       <div className="mt-6 p-4 bg-black/20 rounded-xl space-y-3 border border-white/10">
-         <h4 className="font-bold text-white">📺 Ver anuncios sin límite</h4>
-         <p className="text-xs text-gray-300">Gana recursos extra apoyando la granja</p>
-         
-         <div className="flex gap-2">
-           <Button variant="wood" className="flex-1" onClick={() => game.watchAdForResource('water')}>
-             Ver anuncio (+1 Agua)
-           </Button>
-           <Button variant="wood" className="flex-1" onClick={() => game.watchAdForResource('carrot')}>
-             Ver anuncio (+500 Zanahorias)
-           </Button>
-         </div>
-       </div>
 
-       <p className="notice">Puedes ver todos los anuncios que quieras para acelerar tu progreso.</p>
-     </div>
-   </div>
- </FarmShell>; 
+
+src/lib/farm-planting.ts
+export const BED_CAPACITY = 9;
+
+export function plantedSlots(state: string, slots?: number[]): number[] {
+  return slots ?? (state === 'empty' ? [] : Array.from({ length: BED_CAPACITY }, (_, i) => i));
 }
 
-export function MarketScreen() { 
-  const game = useGame(); 
-  const CONVERSION_RATE = 100000; 
-  const usdValue = (game.carrots / CONVERSION_RATE).toFixed(2);
-  const minWithdrawUSD = 5.00; 
-  const currentUSDNum = game.carrots / CONVERSION_RATE;
-
-  const handleWithdrawRequest = () => {
-    if (currentUSDNum < minWithdrawUSD) {
-      game.toast(`Necesitas al menos $${minWithdrawUSD} USD (${(minWithdrawUSD * CONVERSION_RATE).toLocaleString()} zanahorias) para solicitar un retiro.`);
-      return;
-    }
-    game.toast('¡Solicitud de retiro registrada con éxito! Procesando pago...');
-  };
-
-  return (
-    <FarmShell active="/mercado">
-      <div className="sub-page">
-        <Heading title="El mercado de la cosecha" subtitle="Convierte tus zanahorias de esfuerzo en dinero real." />
-        
-        {/* Tarjeta original restaurada (usa tu styles.css intacto) */}
-        <div className="market-balance">
-          <img src={carrot} alt="Zanahorias cosechadas" />
-          <div>
-            <p>Tu balance actual</p>
-            <strong>{game.carrots.toLocaleString('en-US')}</strong>
-            <p>zanahorias</p>
-          </div>
-        </div>
-
-        {/* Nueva tarjeta estilizada para el valor en USD */}
-        <div className="mt-4 p-5 bg-[#1a1a24]/80 rounded-2xl border border-cyan-500/30 text-center shadow-xl backdrop-blur-sm">
-          <span className="text-xs text-pink-400 uppercase tracking-widest font-bold">Valor Estimado en USD</span>
-          <div className="text-3xl font-extrabold text-white mt-2 mb-1">${usdValue} USD</div>
-          <small className="text-gray-400">Tasa oficial: 100,000 Zanahorias = $1.00 USD</small>
-        </div>
-
-        {/* Tarjeta de Retiros */}
-        <div className="mt-6 p-5 bg-white/5 rounded-2xl border border-white/10 space-y-3 text-center">
-          <h4 className="font-bold text-white text-lg">💰 Sistema de Retiros</h4>
-          <p className="text-sm text-gray-300">
-            Mínimo para retirar: <strong>$5.00 USD</strong> (500,000 zanahorias).
-          </p>
-          
-          <Button 
-            variant="farm" 
-            className="w-full mt-2" 
-            onClick={handleWithdrawRequest}
-          >
-            {currentUSDNum >= minWithdrawUSD ? '🚀 Solicitar Retiro Real' : `Faltan $${(minWithdrawUSD - currentUSDNum).toFixed(2)}`}
-          </Button>
-        </div>
-
-        <div className="mt-4 flex gap-3">
-          <Button variant="wood" asChild className="flex-1">
-            <Link to="/"><Sprout /> Volver a cultivar</Link>
-          </Button>
-        </div>
-      </div>
-    </FarmShell>
-  ); 
+export function fillBed(current: number[], slot?: number): number[] {
+  if (slot === undefined) return Array.from({ length: BED_CAPACITY }, (_, i) => i);
+  if (!Number.isInteger(slot) || slot < 0 || slot >= BED_CAPACITY || current.includes(slot)) return current;
+  return [...current, slot].sort((a, b) => a - b);
 }
-
