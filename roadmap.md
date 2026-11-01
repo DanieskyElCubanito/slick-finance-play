@@ -1,5 +1,5 @@
 # Roadmap
-- [ ] Apply the uploaded sustainable economy to preview cultivation, shop, missions and market, with rule tests.
+- [x] Apply the uploaded sustainable economy to preview cultivation, shop, missions and market, with rule tests.
 - [ ] Connect verified ads, TON payments, referrals, withdrawals and closed-app automation (blocked: external database connection and verified funded services).
 - [x] Prepare the existing game for GitHub export and Vercel hosting, with deployment instructions.
 - [ ] Verify GitHub sync and the actual Vercel deployment (blocked: user must connect/import through their accounts).
