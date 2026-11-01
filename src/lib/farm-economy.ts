@@ -22,8 +22,8 @@ export const STAR_WATERING_CAN = 'Regadera Estrella';
 export const SCARECROW = 'Espantapájaros';
 export type EconomyPlot = {
   crop: 'carrot'; state: 'ready' | 'water' | 'empty' | 'growing';
-  end?: number; start?: number; plantedAt?: number;
-  locked?: string; slots?: number[]; fertilized?: boolean; rainGrown?: boolean;
+  end?: number | undefined; start?: number | undefined; plantedAt?: number | undefined;
+  locked?: string | undefined; slots?: number[]; fertilized?: boolean; rainGrown?: boolean;
 };
 
 export function growthDuration(fertilized = false, raining = false) {
