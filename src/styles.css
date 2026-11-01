@@ -515,6 +515,8 @@ button,a { -webkit-tap-highlight-color: transparent; }
 .bed-actions { position: absolute; bottom: 6%; left: 8%; right: 8%; display: flex; gap: 3px; justify-content: center; }
 .bed-command { flex: 1; min-width: 0; height: 27px; padding: 2px 3px; font-size: 11px; line-height: 1.1; gap: 3px; border-radius: 8px; box-shadow: none; white-space: normal; }
 .bed-command svg { width: 12px; height: 12px; }
+.bed-fertilizer { position: absolute; top: 7%; left: 10%; width: 26px; height: 26px; padding: 3px; z-index: 4; }
+.bed-fertilizer svg { width: 16px; height: 16px; }
 @media(max-width:700px) {
  .farm-scene { min-height: 530px; }
  .tito-speech { display: none; }

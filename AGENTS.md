@@ -15,3 +15,4 @@
 - Track occupied positions per bed through shared pure planting helpers, with separate position buttons and bed actions to avoid nested interactive controls and keep individual and bulk planting consistent.
 - Use the shared Vite configuration's Nitro Vercel preset for external hosting while retaining Lovable's managed target override; this preserves SSR and direct navigation without SPA rewrites.
 - External database connections must use the generated integration after the user links their project in settings; deployment preparation must not imply preview state is already persisted.
+- Centralize economy values and pure crop transitions in a tested economy module; preview rewards never imply verified referrals, payments, withdrawals or closed-app processing.

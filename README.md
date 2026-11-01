@@ -6,6 +6,16 @@ Juego de finca ilustrada en español con Tito, nueve parcelas y nueve posiciones
 
 El progreso vive en memoria y se reinicia al recargar. No hay base de datos, cuentas, anuncios reales, pagos ni retiros conectados. Publicar en Vercel no cambia estas limitaciones.
 
+### Economía de prueba
+
+- Solo zanahorias: cultivo regado de 4 horas; fertilizante o lluvia semanal de 2 horas. Las siembras nuevas sin agua se pierden a las 24 horas salvo protección del espantapájaros.
+- Fertilizante x5: 1,000 zanahorias; Espantapájaros permanente: 10,000; Regadera Estrella permanente: 25,000 (2 surcos por balde).
+- Recompensas voluntarias de prueba: acelerar todos los cultivos en crecimiento una hora, +1 balde, o cobrar una misión x3 en vez de su recompensa base. Sin proveedor de anuncios, se identifica como simulación.
+- Pozo de Oro (1.5 TON) y Tractor Autónomo (3 TON) están desactivados. No hay automatización con el juego cerrado.
+- Referidos: simulación de primera cosecha por +100 zanahorias. Cashback del 5% y comisión TON del 1% aún no conectados.
+- Conversión prevista: 100,000 zanahorias por USD; mínimo previsto de USD 5 (500,000 zanahorias). No representa dinero disponible y no permite solicitar retiros.
+- Las reglas puras de esta economía tienen pruebas en `src/test/farm-economy.test.ts`. Guardado, referidos y premios reales necesitan validación por jugador en el servicio conectado antes de activarlos.
+
 ## 1. GitHub
 
 En Lovable abre **Ajustes del proyecto → Git** y revisa la conexión y la rama sincronizada. Si ya está conectado, comprueba allí que los cambios llegaron al repositorio. Si no está conectado, conecta GitHub desde esa pantalla: crea un repositorio privado nuevo, no permite seleccionar uno existente.
