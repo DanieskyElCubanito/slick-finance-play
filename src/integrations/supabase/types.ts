@@ -14,7 +14,103 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      admin_sessions: {
+        Row: {
+          created_at: string
+          expires_at: string
+          login_hash: string
+          telegram_id: number
+          token_hash: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at: string
+          login_hash: string
+          telegram_id: number
+          token_hash: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          login_hash?: string
+          telegram_id?: number
+          token_hash?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_sessions_telegram_id_fkey"
+            columns: ["telegram_id"]
+            isOneToOne: false
+            referencedRelation: "telegram_admin_roles"
+            referencedColumns: ["telegram_id"]
+          },
+        ]
+      }
+      economy_proposals: {
+        Row: {
+          created_at: string
+          goal: string
+          id: string
+          model: string
+          proposal: Json | null
+          status: string
+          telegram_id: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          goal: string
+          id?: string
+          model: string
+          proposal?: Json | null
+          status?: string
+          telegram_id: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          goal?: string
+          id?: string
+          model?: string
+          proposal?: Json | null
+          status?: string
+          telegram_id?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "economy_proposals_telegram_id_fkey"
+            columns: ["telegram_id"]
+            isOneToOne: false
+            referencedRelation: "telegram_admin_roles"
+            referencedColumns: ["telegram_id"]
+          },
+        ]
+      }
+      telegram_admin_roles: {
+        Row: {
+          created_at: string
+          role: string
+          telegram_id: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          role?: string
+          telegram_id: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          role?: string
+          telegram_id?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
