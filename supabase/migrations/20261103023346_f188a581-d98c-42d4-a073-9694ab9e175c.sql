@@ -1,0 +1,14 @@
+CREATE TABLE public.telegram_admin_roles (telegram_id bigint PRIMARY KEY, role text NOT NULL DEFAULT 'owner', created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now());
+GRANT ALL ON public.telegram_admin_roles TO service_role;
+ALTER TABLE public.telegram_admin_roles ENABLE ROW LEVEL SECURITY;
+INSERT INTO public.telegram_admin_roles (telegram_id) VALUES (8968109534);
+CREATE TABLE public.admin_sessions (token_hash text PRIMARY KEY, telegram_id bigint NOT NULL REFERENCES public.telegram_admin_roles(telegram_id), login_hash text UNIQUE NOT NULL, expires_at timestamptz NOT NULL, created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now());
+GRANT ALL ON public.admin_sessions TO service_role;
+ALTER TABLE public.admin_sessions ENABLE ROW LEVEL SECURITY;
+CREATE TABLE public.economy_proposals (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), telegram_id bigint NOT NULL REFERENCES public.telegram_admin_roles(telegram_id), goal text NOT NULL, proposal jsonb, status text NOT NULL DEFAULT 'pending', model text NOT NULL, created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now());
+GRANT ALL ON public.economy_proposals TO service_role;
+ALTER TABLE public.economy_proposals ENABLE ROW LEVEL SECURITY;
+CREATE FUNCTION public.admin_touch_updated_at() RETURNS trigger LANGUAGE plpgsql SET search_path = public AS $$ BEGIN NEW.updated_at = now(); RETURN NEW; END; $$;
+CREATE TRIGGER admin_roles_updated BEFORE UPDATE ON public.telegram_admin_roles FOR EACH ROW EXECUTE FUNCTION public.admin_touch_updated_at();
+CREATE TRIGGER admin_sessions_updated BEFORE UPDATE ON public.admin_sessions FOR EACH ROW EXECUTE FUNCTION public.admin_touch_updated_at();
+CREATE TRIGGER economy_proposals_updated BEFORE UPDATE ON public.economy_proposals FOR EACH ROW EXECUTE FUNCTION public.admin_touch_updated_at();
