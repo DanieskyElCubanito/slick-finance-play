@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Add owner-only AI economy proposals without automatically changing live game values.
 - [ ] Build owner-only administration for economy, cultivation, players, referrals and financial requests (blocked: external database connection and verified Telegram sign-in setup).
 - [x] Apply the uploaded sustainable economy to preview cultivation, shop, missions and market, with rule tests.
 - [ ] Connect verified ads, TON payments, referrals, withdrawals and closed-app automation (blocked: external database connection and verified funded services).
