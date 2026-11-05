@@ -1,11 +1,13 @@
 # Roadmap
-- [ ] Add owner-only AI economy proposals without automatically changing live game values.
-- [ ] Build owner-only administration for economy, cultivation, players, referrals and financial requests (blocked: external database connection and verified Telegram sign-in setup).
+- [x] Add owner-only AI economy proposals without automatically changing live game values.
+- [ ] Verify owner login and a real AI proposal inside Telegram (blocked: owner must open the configured bot Mini App).
+- [ ] Build remaining administration for cultivation, players, referrals and financial requests (blocked: saved player identity and verified financial services).
 - [x] Apply the uploaded sustainable economy to preview cultivation, shop, missions and market, with rule tests.
 - [ ] Connect verified ads, TON payments, referrals, withdrawals and closed-app automation (blocked: external database connection and verified funded services).
 - [x] Prepare the existing game for GitHub export and Vercel hosting, with deployment instructions.
 - [ ] Verify GitHub sync and the actual Vercel deployment (blocked: user must connect/import through their accounts).
-- [ ] Connect the user's external Supabase project and implement saved progress (blocked: user must connect it in project settings).
+- [x] Connect the user's external Supabase project.
+- [ ] Implement saved player progress (blocked: player identity flow must be established separately from owner administration).
 - [x] Give each bed nine individually plantable spaces and a plant-all action.
 - [x] Replace unused plowed background with grass and verify planting at phone and desktop sizes.
 - [x] Create improved illustrated assets from the references.

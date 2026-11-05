@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AmigosRouteImport } from './routes/amigos'
 import { Route as MercadoRouteImport } from './routes/mercado'
 import { Route as MisionesRouteImport } from './routes/misiones'
@@ -19,6 +20,11 @@ import { Route as TiendaRouteImport } from './routes/tienda'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AmigosRoute = AmigosRouteImport.update({
@@ -49,6 +55,7 @@ const TiendaRoute = TiendaRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/amigos': typeof AmigosRoute
   '/mercado': typeof MercadoRoute
   '/misiones': typeof MisionesRoute
@@ -57,6 +64,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/amigos': typeof AmigosRoute
   '/mercado': typeof MercadoRoute
   '/misiones': typeof MisionesRoute
@@ -66,6 +74,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/amigos': typeof AmigosRoute
   '/mercado': typeof MercadoRoute
   '/misiones': typeof MisionesRoute
@@ -74,12 +83,15 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/amigos' | '/mercado' | '/misiones' | '/pozo' | '/tienda'
+  fullPaths:
+    '/' | '/admin' | '/amigos' | '/mercado' | '/misiones' | '/pozo' | '/tienda'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/amigos' | '/mercado' | '/misiones' | '/pozo' | '/tienda'
+  to:
+    '/' | '/admin' | '/amigos' | '/mercado' | '/misiones' | '/pozo' | '/tienda'
   id:
     | '__root__'
     | '/'
+    | '/admin'
     | '/amigos'
     | '/mercado'
     | '/misiones'
@@ -89,6 +101,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRoute
   AmigosRoute: typeof AmigosRoute
   MercadoRoute: typeof MercadoRoute
   MisionesRoute: typeof MisionesRoute
@@ -103,6 +116,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/amigos': {
@@ -145,6 +165,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRoute,
   AmigosRoute: AmigosRoute,
   MercadoRoute: MercadoRoute,
   MisionesRoute: MisionesRoute,

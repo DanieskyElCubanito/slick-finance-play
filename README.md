@@ -4,7 +4,17 @@ Juego de finca ilustrada en español con Tito, nueve parcelas y nueve posiciones
 
 ## Estado actual
 
-El progreso vive en memoria y se reinicia al recargar. No hay base de datos, cuentas, anuncios reales, pagos ni retiros conectados. Publicar en Vercel no cambia estas limitaciones.
+Supabase externo está conectado. El panel privado guarda sesiones administrativas y propuestas de IA. El progreso del juego todavía vive en memoria y se reinicia al recargar; anuncios reales, pagos y retiros siguen sin conectar.
+
+### Panel de economía con IA
+
+En Ajustes → Panel del propietario (o `/admin`), abre el juego como Mini App desde el bot de Telegram configurado. Solo la identidad firmada de Telegram con rol de propietario puede entrar. No se acepta escribir un ID. Las pruebas firmadas caducan en cinco minutos, no pueden reutilizarse y la sesión privada dura una hora.
+
+El propietario puede describir un objetivo, generar una propuesta de precios, tiempos y recompensas, comparar valores actuales y propuestos, consultar el historial privado y descargar el borrador. Ninguna propuesta se aplica automáticamente. Si falla la IA, se conserva la solicitud sin reintentos automáticos.
+
+Para abrir la Mini App configura en BotFather la URL publicada del juego para el bot cuyo token guardaste. La comprobación completa con la cuenta real del propietario debe hacerse dentro de Telegram.
+
+En Vercel añade las variables privadas `TELEGRAM_BOT_TOKEN`, `LOVABLE_API_KEY`, `SUPABASE_URL` y `SUPABASE_SERVICE_ROLE_KEY`, además de las variables públicas generadas de Supabase. Copia sus valores desde sus ajustes seguros, nunca al repositorio. Las migraciones del panel ya fueron aplicadas al proyecto Supabase conectado.
 
 ### Economía de prueba
 
@@ -46,9 +56,9 @@ Si falla la compilación, consulta **Build Logs**. Si una página falla, consult
 
 ## 3. Tu Supabase
 
-Conéctalo primero en **Lovable → Ajustes → General → External Supabase → Connect**. El propietario realiza esa conexión desde la interfaz.
+El proyecto externo ya está conectado mediante la integración generada de Lovable.
 
-Conectarlo no guarda partidas automáticamente: después hay que implementar identidad de jugadores, tablas, permisos por jugador y lectura/escritura del progreso. No se incluyen tablas vacías ni guardado ficticio en esta preparación.
+Conectarlo no guarda partidas automáticamente: falta implementar identidad de jugadores, permisos por jugador y lectura/escritura del progreso. Las tablas privadas del panel no equivalen a guardar partidas.
 
 Cuando se implemente la integración:
 
