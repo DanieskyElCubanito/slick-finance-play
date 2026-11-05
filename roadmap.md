@@ -1,9 +1,10 @@
 # Roadmap
+- [ ] Replace preview operation with authenticated saved games and server-authoritative balances; scope financial activation with the owner (blocked: payout/funding choice and real Telegram launch verification).
 - [x] Add owner-only AI economy proposals without automatically changing live game values.
 - [ ] Verify owner login and a real AI proposal inside Telegram (blocked: owner must open the configured bot Mini App).
 - [ ] Build remaining administration for cultivation, players, referrals and financial requests (blocked: saved player identity and verified financial services).
 - [x] Apply the uploaded sustainable economy to preview cultivation, shop, missions and market, with rule tests.
-- [ ] Connect verified ads, TON payments, referrals, withdrawals and closed-app automation (blocked: external database connection and verified funded services).
+- [ ] Connect verified ads, TON payments, referrals, withdrawals and closed-app automation (blocked: verified funded services and real player identity flow; Supabase is connected).
 - [x] Prepare the existing game for GitHub export and Vercel hosting, with deployment instructions.
 - [ ] Verify GitHub sync and the actual Vercel deployment (blocked: user must connect/import through their accounts).
 - [x] Connect the user's external Supabase project.
