@@ -16,3 +16,5 @@
 - Use the shared Vite configuration's Nitro Vercel preset for external hosting while retaining Lovable's managed target override; this preserves SSR and direct navigation without SPA rewrites.
 - External database connections must use the generated integration after the user links their project in settings; deployment preparation must not imply preview state is already persisted.
 - Centralize economy values and pure crop transitions in a tested economy module; preview rewards never imply verified referrals, payments, withdrawals or closed-app processing.
+- Owner administration uses server-verified Telegram Mini App HMAC proofs, replay-protected hashed cookie sessions and a separate private role table; never trust a client ID or Supabase user metadata for this access.
+- AI economy proposals use server-only AI Gateway calls and validated private draft history, never automatic application to gameplay values.
