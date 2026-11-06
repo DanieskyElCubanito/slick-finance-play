@@ -1,0 +1,32 @@
+GRANT ALL ON public.admin_sessions, public.telegram_admin_roles, public.economy_proposals TO service_role;
+CREATE TABLE public.player_profiles (telegram_id bigint PRIMARY KEY, display_name text NOT NULL, username text, photo_url text, preferences jsonb NOT NULL DEFAULT '{}'::jsonb, created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now());
+GRANT ALL ON public.player_profiles TO service_role;
+ALTER TABLE public.player_profiles ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Server manages verified players" ON public.player_profiles FOR ALL TO service_role USING (true) WITH CHECK (true);
+CREATE TABLE public.player_sessions (token_hash text PRIMARY KEY, telegram_id bigint NOT NULL REFERENCES public.player_profiles(telegram_id), login_hash text NOT NULL UNIQUE, expires_at timestamptz NOT NULL, created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now());
+GRANT ALL ON public.player_sessions TO service_role;
+ALTER TABLE public.player_sessions ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Server manages player sessions" ON public.player_sessions FOR ALL TO service_role USING (true) WITH CHECK (true);
+CREATE TABLE public.player_games (telegram_id bigint PRIMARY KEY REFERENCES public.player_profiles(telegram_id), state jsonb NOT NULL, version bigint NOT NULL DEFAULT 0, created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now());
+GRANT ALL ON public.player_games TO service_role;
+ALTER TABLE public.player_games ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Server manages saved games" ON public.player_games FOR ALL TO service_role USING (true) WITH CHECK (true);
+CREATE TABLE public.game_events (id uuid PRIMARY KEY, telegram_id bigint NOT NULL REFERENCES public.player_profiles(telegram_id), action text NOT NULL, carrot_delta bigint NOT NULL, coin_delta bigint NOT NULL, resulting_version bigint NOT NULL, created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now());
+GRANT ALL ON public.game_events TO service_role;
+ALTER TABLE public.game_events ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Server manages game ledger" ON public.game_events FOR ALL TO service_role USING (true) WITH CHECK (true);
+CREATE INDEX game_events_player_time ON public.game_events(telegram_id, created_at DESC);
+CREATE TRIGGER player_profiles_touch BEFORE UPDATE ON public.player_profiles FOR EACH ROW EXECUTE FUNCTION public.admin_touch_updated_at();
+CREATE TRIGGER player_sessions_touch BEFORE UPDATE ON public.player_sessions FOR EACH ROW EXECUTE FUNCTION public.admin_touch_updated_at();
+CREATE TRIGGER player_games_touch BEFORE UPDATE ON public.player_games FOR EACH ROW EXECUTE FUNCTION public.admin_touch_updated_at();
+CREATE TRIGGER game_events_touch BEFORE UPDATE ON public.game_events FOR EACH ROW EXECUTE FUNCTION public.admin_touch_updated_at();
+CREATE FUNCTION public.commit_game_action(p_player bigint, p_version bigint, p_state jsonb, p_event uuid, p_action text, p_carrots bigint, p_coins bigint) RETURNS boolean LANGUAGE plpgsql SECURITY INVOKER SET search_path = public AS $$
+BEGIN
+IF EXISTS (SELECT 1 FROM public.game_events WHERE id=p_event) THEN RETURN false; END IF;
+UPDATE public.player_games SET state=p_state, version=version+1 WHERE telegram_id=p_player AND version=p_version;
+IF NOT FOUND THEN RETURN false; END IF;
+INSERT INTO public.game_events(id,telegram_id,action,carrot_delta,coin_delta,resulting_version) VALUES(p_event,p_player,p_action,p_carrots,p_coins,p_version+1);
+RETURN true;
+END; $$;
+REVOKE ALL ON FUNCTION public.commit_game_action(bigint,bigint,jsonb,uuid,text,bigint,bigint) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.commit_game_action(bigint,bigint,jsonb,uuid,text,bigint,bigint) TO service_role;

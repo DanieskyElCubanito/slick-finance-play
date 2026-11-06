@@ -90,6 +90,144 @@ export type Database = {
           },
         ]
       }
+      game_events: {
+        Row: {
+          action: string
+          carrot_delta: number
+          coin_delta: number
+          created_at: string
+          id: string
+          resulting_version: number
+          telegram_id: number
+          updated_at: string
+        }
+        Insert: {
+          action: string
+          carrot_delta: number
+          coin_delta: number
+          created_at?: string
+          id: string
+          resulting_version: number
+          telegram_id: number
+          updated_at?: string
+        }
+        Update: {
+          action?: string
+          carrot_delta?: number
+          coin_delta?: number
+          created_at?: string
+          id?: string
+          resulting_version?: number
+          telegram_id?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_events_telegram_id_fkey"
+            columns: ["telegram_id"]
+            isOneToOne: false
+            referencedRelation: "player_profiles"
+            referencedColumns: ["telegram_id"]
+          },
+        ]
+      }
+      player_games: {
+        Row: {
+          created_at: string
+          state: Json
+          telegram_id: number
+          updated_at: string
+          version: number
+        }
+        Insert: {
+          created_at?: string
+          state: Json
+          telegram_id: number
+          updated_at?: string
+          version?: number
+        }
+        Update: {
+          created_at?: string
+          state?: Json
+          telegram_id?: number
+          updated_at?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "player_games_telegram_id_fkey"
+            columns: ["telegram_id"]
+            isOneToOne: true
+            referencedRelation: "player_profiles"
+            referencedColumns: ["telegram_id"]
+          },
+        ]
+      }
+      player_profiles: {
+        Row: {
+          created_at: string
+          display_name: string
+          photo_url: string | null
+          preferences: Json
+          telegram_id: number
+          updated_at: string
+          username: string | null
+        }
+        Insert: {
+          created_at?: string
+          display_name: string
+          photo_url?: string | null
+          preferences?: Json
+          telegram_id: number
+          updated_at?: string
+          username?: string | null
+        }
+        Update: {
+          created_at?: string
+          display_name?: string
+          photo_url?: string | null
+          preferences?: Json
+          telegram_id?: number
+          updated_at?: string
+          username?: string | null
+        }
+        Relationships: []
+      }
+      player_sessions: {
+        Row: {
+          created_at: string
+          expires_at: string
+          login_hash: string
+          telegram_id: number
+          token_hash: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at: string
+          login_hash: string
+          telegram_id: number
+          token_hash: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          login_hash?: string
+          telegram_id?: number
+          token_hash?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "player_sessions_telegram_id_fkey"
+            columns: ["telegram_id"]
+            isOneToOne: false
+            referencedRelation: "player_profiles"
+            referencedColumns: ["telegram_id"]
+          },
+        ]
+      }
       telegram_admin_roles: {
         Row: {
           created_at: string
@@ -116,7 +254,18 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      commit_game_action: {
+        Args: {
+          p_action: string
+          p_carrots: number
+          p_coins: number
+          p_event: string
+          p_player: number
+          p_state: Json
+          p_version: number
+        }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
