@@ -9,7 +9,7 @@
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
 
-- Share preview-only farm state through a React context around the route outlet; no financial or persistent service is implied.
+- Share server-loaded player state through a React context around the route outlet; verified Telegram sessions own saves, and no saved resource implies withdrawable money.
 - Keep farm views in a shared screen module with distinct TanStack content routes and route-specific metadata.
 - Render farm beds as an aligned responsive 3×3 ground grid with planted sprites separate from inventory icons, so crops stay contained inside their own soil beds at every screen size.
 - Track occupied positions per bed through shared pure planting helpers, with separate position buttons and bed actions to avoid nested interactive controls and keep individual and bulk planting consistent.
@@ -18,3 +18,4 @@
 - Centralize economy values and pure crop transitions in a tested economy module; preview rewards never imply verified referrals, payments, withdrawals or closed-app processing.
 - Owner administration uses server-verified Telegram Mini App HMAC proofs, replay-protected hashed cookie sessions and a separate private role table; never trust a client ID or Supabase user metadata for this access.
 - AI economy proposals use server-only AI Gateway calls and validated private draft history, never automatic application to gameplay values.
+- Persist gameplay through authenticated server transitions and an atomic version-checked ledger commit; never accept browser balances, timestamps or ad/referral reward claims.

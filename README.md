@@ -4,7 +4,7 @@ Juego de finca ilustrada en español con Tito, nueve parcelas y nueve posiciones
 
 ## Estado actual
 
-Supabase externo está conectado. El panel privado guarda sesiones administrativas y propuestas de IA. El progreso del juego todavía vive en memoria y se reinicia al recargar; anuncios reales, pagos y retiros siguen sin conectar.
+Supabase externo está conectado. El panel privado guarda sesiones administrativas y propuestas de IA. Las partidas personales usan identidad firmada de Telegram y guardado en Supabase. Siembra, riego, cosecha, compras y misiones base se calculan en el servidor y se registran atómicamente con control de versión. Las partidas nuevas no heredan saldos de prueba. La prueba completa con una identidad real dentro de Telegram sigue pendiente; pagos y retiros no están activos.
 
 ### Panel de economía con IA
 
@@ -16,15 +16,17 @@ Para abrir la Mini App configura en BotFather la URL publicada del juego para el
 
 En Vercel añade las variables privadas `TELEGRAM_BOT_TOKEN`, `LOVABLE_API_KEY`, `SUPABASE_URL` y `SUPABASE_SERVICE_ROLE_KEY`, además de las variables públicas generadas de Supabase. Copia sus valores desde sus ajustes seguros, nunca al repositorio. Las migraciones del panel ya fueron aplicadas al proyecto Supabase conectado.
 
-### Economía de prueba
+### Economía y servicios pendientes
 
 - Solo zanahorias: cultivo regado de 4 horas; fertilizante o lluvia semanal de 2 horas. Las siembras nuevas sin agua se pierden a las 24 horas salvo protección del espantapájaros.
 - Fertilizante x5: 1,000 zanahorias; Espantapájaros permanente: 10,000; Regadera Estrella permanente: 25,000 (2 surcos por balde).
-- Recompensas voluntarias de prueba: acelerar todos los cultivos en crecimiento una hora, +1 balde, o cobrar una misión x3 en vez de su recompensa base. Sin proveedor de anuncios, se identifica como simulación.
+- Recompensas de anuncios desactivadas hasta disponer de comprobación independiente del proveedor. Gigapub placement 8567 y `window.showGiga()` están identificados, pero una promesa del navegador no es prueba válida para acreditar premios. No se concede ninguna recompensa simulada.
 - Pozo de Oro (1.5 TON) y Tractor Autónomo (3 TON) están desactivados. No hay automatización con el juego cerrado.
-- Referidos: simulación de primera cosecha por +100 zanahorias. Cashback del 5% y comisión TON del 1% aún no conectados.
+- Referidos, cashback del 5% y comisión TON del 1% aún no conectados. Se eliminaron las invitaciones simuladas y los créditos arbitrarios del navegador.
 - Conversión prevista: 100,000 zanahorias por USD; mínimo previsto de USD 5 (500,000 zanahorias). No representa dinero disponible y no permite solicitar retiros.
-- Las reglas puras de esta economía tienen pruebas en `src/test/farm-economy.test.ts`. Guardado, referidos y premios reales necesitan validación por jugador en el servicio conectado antes de activarlos.
+- Las reglas puras y los cambios de partida tienen pruebas en `src/test/farm-economy.test.ts` y `src/test/saved-game.test.ts`. Los tiempos guardados permiten resolver crecimiento y marchitamiento al volver; no hay tractor automático.
+- El propietario elige TON y comunica disponer de 10000 TON. No se ha verificado ni conectado una tesorería. Hace falta su dirección pública, comprobar fondos en cadena y diseñar transferencias con aprobación desde su propia billetera; nunca guardar la frase semilla.
+- Mini App: https://t.me/VFarmerBunny_bot/game. En BotFather debe apuntar al despliegue vigente y usar el mismo bot que el token privado configurado.
 
 ## 1. GitHub
 
@@ -47,10 +49,10 @@ Se mantiene TanStack Start con renderizado de servidor. `vite.config.ts` selecci
 
 ### Comprobar la publicación
 
-- Abre `/`, cosecha, siembra una posición, completa las nueve y riega.
+- Abre el juego desde Telegram, verifica tu cuenta, siembra una posición, completa las nueve y riega.
 - Recarga directamente `/tienda`, `/misiones`, `/amigos`, `/pozo` y `/mercado`: deben aparecer sus páginas, no un 404.
 - Comprueba las imágenes y que los botones funcionan.
-- Recargar reinicia el progreso hasta implementar guardado real.
+- Recarga y confirma que la partida se conserva. Repite desde otra cuenta de Telegram para comprobar separación de partidas.
 
 Si falla la compilación, consulta **Build Logs**. Si una página falla, consulta los registros de funciones de Vercel. El despliegue externo todavía debe verificarse en tu cuenta; estas instrucciones no representan una publicación ya realizada.
 
@@ -58,9 +60,9 @@ Si falla la compilación, consulta **Build Logs**. Si una página falla, consult
 
 El proyecto externo ya está conectado mediante la integración generada de Lovable.
 
-Conectarlo no guarda partidas automáticamente: falta implementar identidad de jugadores, permisos por jugador y lectura/escritura del progreso. Las tablas privadas del panel no equivalen a guardar partidas.
+Las tablas privadas `player_profiles`, `player_sessions`, `player_games` y `game_events` guardan perfiles, sesiones, partidas y movimientos. El navegador no tiene acceso directo: cada función valida la cookie de una identidad de Telegram verificada. El panel del propietario mantiene su autorización separada.
 
-Cuando se implemente la integración:
+Para desplegar la integración:
 
 - Copia los nombres exactos de las variables utilizadas por la integración generada a **Vercel → Project Settings → Environment Variables**, en Production y Preview según corresponda, y vuelve a desplegar.
 - Solo la URL y la clave pública/publicable pueden usar `VITE_`. Una clave privada o `service_role` nunca debe tener ese prefijo ni subirse a GitHub.

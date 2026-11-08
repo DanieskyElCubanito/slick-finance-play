@@ -1,14 +1,17 @@
 # Roadmap
-- [ ] Replace preview operation with authenticated saved games and server-authoritative balances; scope financial activation with the owner (blocked: payout/funding choice and real Telegram launch verification).
+- [x] Replace preview balances and actions with private Telegram-owned saved games and atomic server-authoritative accounting; TON chosen for financial activation.
+- [ ] Verify saved game login, planting, reload and a real harvest inside Telegram (blocked: real signed Mini App session unavailable in editor).
 - [x] Add owner-only AI economy proposals without automatically changing live game values.
 - [ ] Verify owner login and a real AI proposal inside Telegram (blocked: owner must open the configured bot Mini App).
-- [ ] Build remaining administration for cultivation, players, referrals and financial requests (blocked: saved player identity and verified financial services).
+- [ ] Build remaining administration for cultivation, players, referrals and financial requests (blocked: verified financial services and live player verification).
 - [x] Apply the uploaded sustainable economy to preview cultivation, shop, missions and market, with rule tests.
-- [ ] Connect verified ads, TON payments, referrals, withdrawals and closed-app automation (blocked: verified funded services and real player identity flow; Supabase is connected).
+- [ ] Connect TON payments and withdrawals (blocked: public treasury address and approved wallet transfer setup; reported funds not verified).
+- [ ] Connect rewarded Gigapub ads (blocked: server-verifiable reward receipts; showGiga promise is insufficient).
+- [ ] Connect verified referrals and premium closed-app automation (blocked: live Telegram player verification and premium transaction verification).
 - [x] Prepare the existing game for GitHub export and Vercel hosting, with deployment instructions.
 - [ ] Verify GitHub sync and the actual Vercel deployment (blocked: user must connect/import through their accounts).
 - [x] Connect the user's external Supabase project.
-- [ ] Implement saved player progress (blocked: player identity flow must be established separately from owner administration).
+- [x] Implement separate player Telegram sessions, profiles, saved progress and action ledger.
 - [x] Give each bed nine individually plantable spaces and a plant-all action.
 - [x] Replace unused plowed background with grass and verify planting at phone and desktop sizes.
 - [x] Create improved illustrated assets from the references.
