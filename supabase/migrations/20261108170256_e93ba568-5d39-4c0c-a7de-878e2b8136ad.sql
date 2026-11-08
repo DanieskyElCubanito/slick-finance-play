@@ -1,0 +1,2 @@
+REVOKE ALL ON public.player_profiles, public.player_sessions, public.player_games, public.game_events, public.admin_sessions, public.telegram_admin_roles, public.economy_proposals FROM anon, authenticated;
+GRANT ALL ON public.player_profiles, public.player_sessions, public.player_games, public.game_events, public.admin_sessions, public.telegram_admin_roles, public.economy_proposals TO service_role;

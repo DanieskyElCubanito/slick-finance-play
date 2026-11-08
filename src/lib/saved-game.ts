@@ -27,6 +27,8 @@ export function settleGame(saved: SavedGame, now: number): SavedGame {
   const day = Math.floor(now / (24 * HOUR));
   if (state.day !== day) { state.day = day; state.harvested = 0; state.watered = 0; state.claimedMissions = []; state.bonus = false; }
   state.processedAt = now;
+  const level = Math.min(10, 1 + Math.floor(state.coins / 500));
+  state.plots = state.plots.map(p => p.locked?.startsWith('Nivel ') && level >= Number(p.locked.slice(6)) ? { ...p, locked: undefined } : p);
   return state;
 }
 export function transitionGame(saved: SavedGame, action: GameAction, now: number) {
