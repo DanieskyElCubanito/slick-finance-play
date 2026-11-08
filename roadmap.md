@@ -5,7 +5,8 @@
 - [ ] Verify owner login and a real AI proposal inside Telegram (blocked: owner must open the configured bot Mini App).
 - [ ] Build remaining administration for cultivation, players, referrals and financial requests (blocked: verified financial services and live player verification).
 - [x] Apply the uploaded sustainable economy to preview cultivation, shop, missions and market, with rule tests.
-- [ ] Connect TON payments and withdrawals (blocked: public treasury address and approved wallet transfer setup; reported funds not verified).
+- [x] Validate the supplied mainnet TON treasury address and check its public balance.
+- [ ] Connect TON payments and withdrawals (blocked: wallet ownership proof and approved transfer setup; supplied wallet holds approximately 1.4765 TON, not the reported 10000 TON).
 - [ ] Connect rewarded Gigapub ads (blocked: server-verifiable reward receipts; showGiga promise is insufficient).
 - [ ] Connect verified referrals and premium closed-app automation (blocked: live Telegram player verification and premium transaction verification).
 - [x] Prepare the existing game for GitHub export and Vercel hosting, with deployment instructions.
