@@ -1,9 +1,16 @@
 import { describe, it, expect } from 'vitest';
-import { newSavedGame, transitionGame, gameActionSchema } from '@/lib/saved-game';
+import { newSavedGame, transitionGame, gameActionSchema, settleGame } from '@/lib/saved-game';
 import { HOUR, isRainDay } from '@/lib/farm-economy';
 const start = Date.UTC(2026, 10, 6, 1);
 const dry = Array.from({ length: 7 }, (_, i) => start + i * 24 * HOUR).find(t => !isRainDay(t)) ?? start;
 describe('Real saved game rules', () => {
+  it('opens the level-six bed only when earned progression reaches six', () => {
+    const saved = newSavedGame(dry);
+    saved.coins = 2499;
+    expect(settleGame(saved, dry).plots[4]?.locked).toBe('Nivel 6');
+    saved.coins = 2500;
+    expect(settleGame(saved, dry).plots[4]?.locked).toBeUndefined();
+  });
   it('starts without the old simulated carrot and coin balances', () => {
     expect(newSavedGame(dry).carrots).toBe(0); expect(newSavedGame(dry).coins).toBe(0);
     expect(newSavedGame(dry).plots.filter(p => p.state === 'ready')).toHaveLength(0);

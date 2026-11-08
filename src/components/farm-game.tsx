@@ -6,8 +6,8 @@ import { newSavedGame, type SavedGame, type GameAction } from '@/lib/saved-game'
 import { ArrowLeft, Check, ClipboardList, Coins, Copy, Droplets, Gem, Gift, House, Leaf, LockKeyhole, Mail, Plus, Settings, ShoppingBasket, Sprout, Star, Sun, Users, Volume2, VolumeX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import world from '@/assets/farm-meadow.jpg';
-import { BED_CAPACITY, fillBed, plantedSlots } from '@/lib/farm-planting';
-import { ECONOMY, STAR_WATERING_CAN, SCARECROW, acceleratePlot, advancePlot, carrotUsd, durationLabel, fertilizePlot, growthDuration, isRainDay, missionReward, referralReward, wateringTargets, type EconomyPlot } from '@/lib/farm-economy';
+import { BED_CAPACITY, plantedSlots } from '@/lib/farm-planting';
+import { ECONOMY, STAR_WATERING_CAN, SCARECROW, carrotUsd, durationLabel, isRainDay, type EconomyPlot } from '@/lib/farm-economy';
 import tito from '@/assets/tito.png';
 import carrot from '@/assets/carrot.png';
 import watering from '@/assets/watering.png';
